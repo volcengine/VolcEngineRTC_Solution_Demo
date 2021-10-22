@@ -24,26 +24,30 @@ type HowardConfig struct {
 }
 
 type Configuration struct {
-	PSM 			   string   `yaml:"PSM"`
-	MysqlDSN           string   `yaml:"MysqlDSN"`
-	RedisAddr          string   `yaml:"RedisAddr"`
-	FrontierPSM        string   `yaml:"FrontierPSM"`
-	AppID              string   `yaml:"AppID"`
-	AppKey             string   `yaml:"AppKey"`
-	EnableIPv6         bool     `yaml:"EnableIPv6"`
-	ReconnectTimeout   int      `yaml:"ReconnectTimeout"`
-	RoomUserLimit      int      `yaml:"RoomUserLimit"`
-	VCloudAK           string   `yaml:"VCloudAK"`
-	VCloudSK           string   `yaml:"VCloudSK"`
-	PostProcessingURL  string   `yaml:"PostProcessingURL"`
-	PostProcessingAK   string   `yaml:"PostProcessingAK"`
-	PostProcessingSK   string   `yaml:"PostProcessingSK"`
-	Resolution         string   `yaml:"Resolution"`
-	VideoDays          int      `yaml:"VideoDays"`
-	RoomDurationMinute int      `yaml:"RoomDurationMinute"`
-	RoomWhiteList      []string `yaml:"RoomWhiteList"`
-	VideoObtainingURL  string   `yaml:"VideoObtainingURL"`
+	PSM                string       `yaml:"PSM"`
+	MysqlDSN           string       `yaml:"MysqlDSN"`
+	RedisAddr          string       `yaml:"RedisAddr"`
+	FrontierPSM        string       `yaml:"FrontierPSM"`
+	AppID              string       `yaml:"AppID"`
+	AppKey             string       `yaml:"AppKey"`
+	EnableIPv6         bool         `yaml:"EnableIPv6"`
+	ReconnectTimeout   int          `yaml:"ReconnectTimeout"`
+	RoomUserLimit      int          `yaml:"RoomUserLimit"`
+	VCloudAK           string       `yaml:"VCloudAK"`
+	VCloudSK           string       `yaml:"VCloudSK"`
+	PostProcessingURL  string       `yaml:"PostProcessingURL"`
+	PostProcessingAK   string       `yaml:"PostProcessingAK"`
+	PostProcessingSK   string       `yaml:"PostProcessingSK"`
+	Resolution         string       `yaml:"Resolution"`
+	VideoDays          int          `yaml:"VideoDays"`
+	RoomDurationMinute int          `yaml:"RoomDurationMinute"`
+	RoomWhiteList      []string     `yaml:"RoomWhiteList"`
+	VideoObtainingURL  string       `yaml:"VideoObtainingURL"`
 	HowardConfig       HowardConfig `yaml:"howard_config"`
+
+	EduCreatedExpireTime int `yaml:"EduCreatedExpireTime"`
+	EduGroupNum          int `yaml:"EduGroupNum"`
+	EduGroupLimit        int `yaml:"EduGroupLimit"`
 }
 
 var Config Configuration

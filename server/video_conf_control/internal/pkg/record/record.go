@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/TTvcloud/vcloud-sdk-golang/base"
 	uuid "github.com/satori/go.uuid"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/config"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/config"
+	"github.com/volcengine/volc-sdk-golang/base"
 )
 
 var client *base.Client
@@ -20,6 +20,9 @@ const (
 	updateRecord = "UpdateRecord"
 	stopRecord   = "StopRecord"
 	version      = "2020-12-01"
+
+	MixStreamMode    = 0
+	SingleStreamMode = 1
 )
 
 func Init() {
@@ -72,9 +75,9 @@ func getHTTPHeader() http.Header {
 	}
 }
 
-func StartRecord(ctx context.Context, users []string, screen, appID, roomID string) (string, error) {
+func StartRecord(ctx context.Context, users []string, screen, appID, roomID string, mode int) (string, error) {
 	taskID := getUUID()
-	param := genStartParam(users, screen, appID, roomID, taskID)
+	param := genStartParam(users, screen, appID, roomID, taskID, mode)
 	res, code, err := client.Json(startRecord, nil, param)
 
 	if err != nil || code != 200 {
@@ -146,14 +149,20 @@ func getUUID() string {
 	return uuid.Must(uuid.NewV4(), nil).String()
 }
 
-func genStartParam(users []string, screen, appID, roomID, taskID string) string {
+/*
+1. mode: 0表示合流录制，1表示单流录制
+2.
+*/
+func genStartParam(users []string, screen, appID, roomID, taskID string, mode int) string {
 	p := startRecordParam{
 		AppID:         appID,
 		RoomID:        roomID,
 		TaskID:        taskID,
-		RecordMode:    0, // Mixed stream recording
+		RecordMode:    mode,
 		TargetStreams: genTargetStreams(users, screen),
-		Layout:        genLayout(users, screen),
+	}
+	if mode == 0 {
+		p.Layout = genLayout(users, screen)
 	}
 
 	if r, err := json.Marshal(p); err == nil {

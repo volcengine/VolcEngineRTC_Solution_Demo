@@ -8,10 +8,10 @@ import (
 	"github.com/cloudwego/kitex/client/callopt"
 	"github.com/cloudwego/kitex/pkg/connpool"
 	"github.com/cloudwego/kitex/transport"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/config"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/frontier"
-	frontierCli "github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/frontier/frontier"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/pkg/public"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/config"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/frontier"
+	frontierCli "github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/frontier/frontier"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/pkg/public"
 )
 
 var client frontierCli.Client

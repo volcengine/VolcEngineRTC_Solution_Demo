@@ -6,7 +6,7 @@ import (
 	"context"
 	"github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/frontier"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/frontier"
 )
 
 func serviceInfo() *kitex.ServiceInfo {

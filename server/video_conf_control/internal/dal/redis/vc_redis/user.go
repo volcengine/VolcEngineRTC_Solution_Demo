@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/redis"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/redis"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 func GetUserIDByTaskID(ctx context.Context, taskID string) string {
-	userID := redis.Client.Get(ctx, TaskIDKeyPrefix + taskID).Val()
+	userID := redis.Client.Get(ctx, TaskIDKeyPrefix+taskID).Val()
 	return userID
 }
 

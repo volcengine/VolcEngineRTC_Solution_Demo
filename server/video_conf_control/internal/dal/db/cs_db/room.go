@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 	"time"
 
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/pkg/public"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/pkg/public"
 )
 
 func BatchCreateRoomUser(ctx context.Context, room *db.CsMeetingRoom, user *db.CsMeetingUser) error {

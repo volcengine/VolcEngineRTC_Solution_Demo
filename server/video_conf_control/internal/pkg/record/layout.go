@@ -1,6 +1,6 @@
 package record
 
-import "github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/config"
+import "github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/config"
 
 func genLayout(users []string, screen string) layout {
 	switch {

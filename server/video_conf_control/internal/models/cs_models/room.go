@@ -12,15 +12,15 @@ import (
 
 	goredis "github.com/go-redis/redis/v8"
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db/conn_db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db/cs_db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/redis/cs_redis"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/redis/lock"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/response"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/rpc/frontier"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/pkg/public"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db/conn_db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db/cs_db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/redis/cs_redis"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/redis/lock"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/response"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/rpc/frontier"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/pkg/public"
 )
 
 const (

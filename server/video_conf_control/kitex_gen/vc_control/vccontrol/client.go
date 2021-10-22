@@ -6,7 +6,7 @@ import (
 	"context"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/callopt"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
 )
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.

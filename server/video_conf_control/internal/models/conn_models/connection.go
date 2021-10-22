@@ -4,9 +4,9 @@ import (
 	"context"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db/conn_db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db/conn_db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
 )
 
 type Connection struct {

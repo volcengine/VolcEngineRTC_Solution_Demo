@@ -3,8 +3,8 @@ package conn_db
 import (
 	"context"
 
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/pkg/public"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/pkg/public"
 )
 
 func CreateConnection(ctx context.Context, conn *db.MeetingConnection) error {

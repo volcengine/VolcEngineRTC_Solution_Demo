@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/vc_models"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/service/service_utils"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/vc_models"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/service/service_utils"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
 )
 
 type leaveMeetingParam struct {

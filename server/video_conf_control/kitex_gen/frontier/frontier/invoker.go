@@ -4,7 +4,7 @@ package frontier
 
 import (
 	"github.com/cloudwego/kitex/server"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/frontier"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/frontier"
 )
 
 // NewInvoker creates a server.Invoker with the given handler and options.

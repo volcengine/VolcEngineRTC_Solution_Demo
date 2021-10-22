@@ -4,8 +4,8 @@ import (
 	"context"
 	"gorm.io/gorm"
 
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/pkg/public"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/pkg/public"
 )
 
 // 根据RoomID UserID DeviceID 唯一的确定一个用户

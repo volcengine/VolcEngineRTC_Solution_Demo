@@ -8,21 +8,21 @@ import (
 	kc "github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/connpool"
 	"github.com/cloudwego/kitex/transport"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/config"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/base"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/howard"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/howard/howardservice"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/config"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/base"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/howard"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/howard/howardservice"
 )
 
 const (
-	statusCodeSuccess                       = 0
-	statusCodeVidNotExistInRecords          = 1020
+	statusCodeSuccess              = 0
+	statusCodeVidNotExistInRecords = 1020
 )
 
 const cleanVideoTimeout = 1000 * time.Millisecond
 
 var (
-	client    howardservice.Client
+	client howardservice.Client
 )
 
 func Init() {

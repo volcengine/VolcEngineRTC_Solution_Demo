@@ -7,11 +7,11 @@ import (
 	"gorm.io/gorm"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db/vc_db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/vc_models"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/service/service_utils"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db/vc_db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/vc_models"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/service/service_utils"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
 )
 
 type getHistoryRecordParam struct {
@@ -64,7 +64,6 @@ func deleteVideoRecord(ctx context.Context, param *vc_control.TEventParam) {
 		service_utils.Push2ClientWithoutReturn(ctx, param, custom_error.ErrInput)
 		return
 	}
-
 
 	userID := ""
 

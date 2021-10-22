@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/base"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/base"
 	"strings"
 )
 

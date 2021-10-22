@@ -6,11 +6,10 @@ import (
 	"gorm.io/gorm"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db/vc_db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/video"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/rpc/howard"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db/vc_db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/video"
 )
 
 type VCloudRecord struct {
@@ -95,7 +94,7 @@ func getVideoRecords(ctx context.Context, userID string, records []*db.MeetingVi
 }
 
 func (vr *VCloudRecord) DeleteVideoRecord(ctx context.Context, vid string) error {
-	_, err := howard.DeleteRecord(ctx, vid)
+	_, err := video.DeleteRecord(ctx, vid)
 	if err != nil {
 		return custom_error.InternalError(err)
 	}

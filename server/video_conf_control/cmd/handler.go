@@ -4,13 +4,13 @@ import (
 	"context"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/record"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/service/conn_service"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/service/cs_service"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/service/vc_service"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/base"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/pkg/public"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/record"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/service/conn_service"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/service/cs_service"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/service/vc_service"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/base"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/pkg/public"
 )
 
 const (

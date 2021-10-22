@@ -4,8 +4,8 @@ import (
 	"context"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/cs_models"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/cs_models"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
 )
 
 func Disconnect(ctx context.Context, param *vc_control.TEventParam) {

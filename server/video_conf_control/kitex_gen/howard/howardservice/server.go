@@ -3,7 +3,7 @@ package howardservice
 
 import (
 	"github.com/cloudwego/kitex/server"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/howard"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/howard"
 )
 
 // NewServer creates a server.Server with the given handler and options.

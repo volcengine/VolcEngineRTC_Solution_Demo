@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/redis"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/redis"
 )
 
 const (

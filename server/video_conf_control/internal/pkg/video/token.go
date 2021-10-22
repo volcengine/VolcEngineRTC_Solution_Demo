@@ -1,18 +1,6 @@
 package video
 
-import (
-	"encoding/base64"
-	"encoding/json"
-	"net/url"
-	"sync"
-	"time"
-
-	"github.com/TTvcloud/vcloud-sdk-golang/base"
-	"github.com/TTvcloud/vcloud-sdk-golang/service/vod"
-	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/config"
-)
-
+/*
 type token struct {
 	tokenURL string
 	sync.RWMutex
@@ -63,3 +51,4 @@ func (t *token) update() {
 	t.tokenURL = playAuthToken["GetPlayInfoToken"]
 	t.Unlock()
 }
+*/

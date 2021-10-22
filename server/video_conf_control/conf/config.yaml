@@ -14,6 +14,9 @@ PostProcessingAK:
 PostProcessingSK:
 Resolution: 720
 VideoDays: 90
+EduCreatedExpireTime: 30
+EduGroupNum: 20000
+EduGroupLimit: 6
 RoomDurationMinute: 10
 RoomWhiteList:
   -

@@ -1,7 +1,7 @@
 package vc_service
 
 import (
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/service/service_utils"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/service/service_utils"
 )
 
 var eventHandler = map[string]service_utils.EventHandlerFunc{

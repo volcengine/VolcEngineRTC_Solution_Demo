@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/response"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/rpc/frontier"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/response"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/rpc/frontier"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
 )
 
 type EventHandlerFunc func(ctx context.Context, param *vc_control.TEventParam)

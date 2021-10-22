@@ -7,16 +7,16 @@ import (
 	"time"
 
 	logs "github.com/sirupsen/logrus"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/config"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/db/vc_db"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/dal/redis/vc_redis"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/conn_models"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/models/custom_error"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/record"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/response"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/pkg/token"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/internal/rpc/frontier"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/config"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/db/vc_db"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/dal/redis/vc_redis"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/conn_models"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/models/custom_error"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/record"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/response"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/pkg/token"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/internal/rpc/frontier"
 )
 
 const MaxReconnectRetry = 5
@@ -197,13 +197,13 @@ func (u *User) GenerateToken(ctx context.Context) (string, error) {
 
 func (u *User) GenerateInformUserInfo() UserInfo {
 	return UserInfo{
-		UserID:          u.u.UserID,
-		RoomID:          u.u.RoomID,
-		IsHost:          u.u.IsHost,
-		IsMicOn:         u.u.IsMicOn,
-		IsCameraOn:      u.u.IsCameraOn,
-		IsSharing:       u.u.IsSharing,
-		CreatedAt:       u.u.CreatedAt.UnixNano(),
+		UserID:     u.u.UserID,
+		RoomID:     u.u.RoomID,
+		IsHost:     u.u.IsHost,
+		IsMicOn:    u.u.IsMicOn,
+		IsCameraOn: u.u.IsCameraOn,
+		IsSharing:  u.u.IsSharing,
+		CreatedAt:  u.u.CreatedAt.UnixNano(),
 	}
 }
 
@@ -284,7 +284,7 @@ func (u *User) StartRecord(ctx context.Context, users []string, screen string) e
 	if err := u.checkRoomAndUserState(ctx, true); err != nil {
 		return err
 	}
-	taskID, err := record.StartRecord(ctx, users, screen, u.u.AppID, u.u.RoomID)
+	taskID, err := record.StartRecord(ctx, users, screen, u.u.AppID, u.u.RoomID, record.MixStreamMode)
 	if err != nil {
 		logs.Errorf("failed to start record, err: %v", err)
 		return custom_error.InternalError(err)

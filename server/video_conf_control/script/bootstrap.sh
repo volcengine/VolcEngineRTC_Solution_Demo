@@ -1,5 +1,4 @@
 #! /usr/bin/env bash
-export PSM=${PSM:-video_conf_control}
 CURDIR=$(cd $(dirname $0); pwd)
 
 if [ "X$1" != "X" ]; then

@@ -3,7 +3,7 @@ package vccontrol
 
 import (
 	"github.com/cloudwego/kitex/server"
-	"github.com/volcengine/VolcEngineRTC/server/video_conf_control/kitex_gen/vc_control"
+	"github.com/volcengine/VolcEngineRTC_Solution_Demo/server/video_conf_control/kitex_gen/vc_control"
 )
 
 // NewServer creates a server.Server with the given handler and options.
