@@ -1,0 +1,16 @@
+@import '~@/utils/utils.less';
+
+.container {
+  .flex-box();
+  justify-content: center;
+  background-color: @meetingBackgroundColor;
+  width: 100%;
+  height: calc(100% - 50px);
+  color: #fff;
+  overflow: hidden;
+}
+
+.videoHidden {
+  opacity: 0;
+  z-index: -1000;
+}

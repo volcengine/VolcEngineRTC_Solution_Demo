@@ -1,0 +1,113 @@
+@import "~@/utils/utils.less";
+
+.container {
+  color: #fff;
+
+  .userContainer {
+    .flex-box();
+    width: 100%;
+    height: 48px;
+    padding: 0 10px;
+
+    &:hover {
+      background-color: #282e3a;
+    }
+
+    .left {
+      .flex-box();
+      align-items: flex-start;
+
+      .avatar {
+        font-weight: 600;
+        font-size: 14px;
+        width: 28px;
+        height: 28px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 28px;
+        border-radius: 14px;
+        user-select: none;
+        margin-top: 4px;
+        background-color: #505968;
+      }
+
+      .usernameContainer {
+        .flex-box();
+        flex-direction: column;
+        padding-left: 8px;
+        align-items: flex-start;
+
+        .username {
+          .flex-box();
+          line-height: 24px;
+        }
+
+        .tag {
+          display: inline-block;
+          margin-right: 4px;
+          padding: 2px;
+          color: #4d82f7;
+          background-color: #1D2129;
+          user-select: none;
+        }
+      }
+    }
+
+    .right {
+      .flex-box();
+      .micOnIcon{
+        background: url('../../../../../assets/images/micOnIcon.png');
+        background-size: contain;
+        display: inline-block;
+        width: 12px;
+        height: 16px;
+      }
+      .micOffIcon {
+        background: url('../../../../../assets/images/micOffIcon.png');
+        background-size: contain;
+        display: inline-block;
+        width: 15px;
+        height: 16px;
+      }
+      .micHasVolume {
+        background: url('../../../../../assets/images/micHasVolume.png');
+        background-size: contain;
+        display: inline-block;
+        width: 12px;
+        height: 16px;
+        position: relative;
+      }
+    }
+  }
+  .useContainerWrapper{
+    height: calc(100% - 40px);
+    overflow-y: scroll;
+  }
+  .useMuteAll{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 16px;
+    width: 100%;
+    .useMuteAllButton{
+      border: 1px solid #272E3B;
+      background: #272E3B;
+      border-radius: 2px;
+      color: #FFFFFF;
+      font-size: 12px;
+      width: 100%;
+      >span:nth-of-type(1) {
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        margin-bottom: 3px;
+        line-height: 14px;
+        img {
+          width: 100%;
+          display: inline-block;
+        }
+      }
+    }
+  }
+}

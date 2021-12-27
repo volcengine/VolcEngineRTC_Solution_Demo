@@ -1,0 +1,67 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "cross-env umi dev",
+    "postinstall": "umi generate tmp",
+    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "test": "umi-test",
+    "test:coverage": "umi-test --coverage"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@ant-design/pro-layout": "^6.5.0",
+    "@umijs/hooks": "^1.9.3",
+    "antd": "^4.16.6",
+    "debug": "^4.3.1",
+    "dva-model-creator": "^0.4.3",
+    "eventemitter3": "^4.0.7",
+    "lodash.chunk": "^4.2.0",
+    "lodash.debounce": "^4.0.8",
+    "socket.io-client": "2.3.1",
+    "umi": "^3.5.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.6",
+    "@types/lodash.chunk": "^4.2.6",
+    "@types/lodash.debounce": "^4.0.6",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-test-renderer": "^16.0.3",
+    "@types/socket.io-client": "1.4.32",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "@umijs/plugin-sass": "^1.1.1",
+    "@umijs/preset-react": "1.x",
+    "@umijs/test": "^3.4.25",
+    "babel-eslint": "^9.0.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.28.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^10.0.7",
+    "prettier": "^2.2.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "tslib": "^2.3.0",
+    "typescript": "^4.3.2",
+    "yorkie": "^2.0.0"
+  }
+}

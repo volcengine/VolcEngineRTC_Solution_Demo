@@ -1,0 +1,44 @@
+@import '~@/utils/utils.less';
+
+.container {
+  .flex-box();
+  background-color: @meetingBackgroundColor;
+  width: 100%;
+  height: 50px;
+  padding: 0 24px;
+  color: #fff;
+
+  .center {
+    position: absolute;
+    width: calc(100% - 48px);
+    text-align: center;
+    .split {
+      .split-line(17px, 8px);
+    }
+    .collapse {
+      cursor: pointer;
+      margin-left: 20px;
+      color: #a7a7a7;
+      font-size: 12px;
+      line-height: 19px;
+      em {
+        font-style: normal;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .right {
+    .avatar {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      background-color: #4e5969;
+      text-align: center;
+      line-height: 28px;
+      font-weight: bold;
+      user-select: none;
+    }
+  }
+}

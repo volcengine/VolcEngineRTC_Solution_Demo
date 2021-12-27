@@ -1,0 +1,83 @@
+.feedback{
+  .title{
+    font-family: PingFang SC;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0em;
+    text-align: left;
+    margin-bottom: 16px;
+  }
+  .good, .bad{
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    text-align: center;
+  }
+  .good{
+    background-image: url('../../../assets/images/good.png');
+    background-size: contain;
+    &:hover{
+      background-image: url('../../../assets/images/good_selected.png');
+    }
+  }
+  .bad {
+    background-image: url('../../../assets/images/bad.png');
+    background-size: contain;
+
+    &:hover {
+      background-image: url('../../../assets/images/bad_selected.png');
+    }
+  }
+  .questions{
+    margin-bottom: 24px;
+    span{
+      width: 80px;
+      height: 32px;
+      padding: 6px 16px;
+      background: #F2F3F8;
+      border-radius: 2px;
+      font-family: PingFang SC;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 20px;
+      letter-spacing: 0em;
+      text-align: left;
+      margin-right: 16px;
+      cursor: pointer;
+      color: #1D2129;
+      &.span-selected{
+        background: #E8F3FF;
+        color: #165DFF;
+      }
+    }
+  }
+  .bottom{
+    text-align: center;
+    margin-top: 24px;
+    span{
+      font-size: 12px;
+    }
+  }
+  .text{
+    position: relative;
+    textarea::placeholder {
+      font-family: PingFang SC;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 12px;
+      line-height: 20px;
+    }
+  }
+  :global{
+    .ant-input-textarea-show-count::after{
+      position: absolute;
+      bottom: 4px;
+      right: 10px;
+      font-size: 12px;
+      line-height: 20px;
+    }
+  }
+}

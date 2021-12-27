@@ -1,0 +1,62 @@
+.settings-modal {
+  :global {
+    .ant-modal-title {
+      text-align: center;
+    }
+
+    .ant-modal-body {
+      padding-left: 10px;
+      padding-right: 10px;
+      max-height: calc(100vh - 350px);
+      overflow: scroll;
+    }
+
+    .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+      border-color: #40a9ff;
+    }
+
+    .ant-input-number:hover {
+      border-color: #40a9ff;
+    }
+  }
+}
+
+.slider-number {
+  box-sizing: border-box;
+  font-variant: tabular-nums;
+  list-style: none;
+  font-feature-settings: 'tnum', "tnum";
+  position: relative;
+  width: 56px;
+  min-width: 0;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  line-height: 1.5715;
+  background-color: #F2F3F5;
+  background-image: none;
+  transition: all 0.3s;
+  display: inline-block;
+  margin: 0;
+  padding: 4px 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.my-video-list {
+  img {
+    display: none;
+  }
+  
+  &:hover {
+    img {
+      display: block;
+    }
+  }
+}
+
+.my-video-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
