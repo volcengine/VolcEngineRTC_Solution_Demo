@@ -1,0 +1,28 @@
+version: '3'
+services:
+  mysql_server:
+    container_name: mysql_server
+    build: ../Server/mysql
+    restart: always
+      
+  redis_server:
+    container_name: redis_server
+    image: "redis:latest"
+    restart: always
+
+
+  rtc_demo_server:
+    container_name: rtc_demo_server
+    build: ../Server/rtc_demo_server
+    depends_on:
+      - mysql_server
+      - redis_server
+    links:
+      - "mysql_server:mysql_server"
+      - "redis_server:redis_server"
+    ports:
+      - "18080:18080"
+    restart: always
+  
+      
+  
