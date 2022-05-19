@@ -1,4 +1,5 @@
-import React, { FC, useState, useEffect, useMemo } from 'react';
+import React, { FC, useState, useEffect, useMemo, useCallback } from 'react';
+import { StreamIndex } from '@volcengine/rtc';
 import { Modal, Form, Select, Switch, Slider, Row, Col, notification } from 'antd';
 import { connect, bindActionCreators } from 'dva';
 import { injectIntl } from 'umi';
@@ -6,22 +7,24 @@ import { ConnectedProps } from 'react-redux';
 import { WrappedComponentProps } from 'react-intl';
 import styles from './index.less';
 import { RESOLUTIOIN_LIST, FRAMERATE, BITRATEMAP } from '@/config';
-import { AppState, DeviceInstance, DeviceItems } from '@/app-interfaces';
+import { AppState, DeviceItems } from '@/app-interfaces';
 import { Dispatch } from '@@/plugin-dva/connect';
 import { meetingSettingsActions } from '@/models/meeting-settings';
 import { HistoryVideoRecord } from '@/lib/socket-interfaces';
 import deleteIcon from '/assets/images/deleteIcon.png';
 import moment from 'moment';
-import RTC from '@/sdk/VRTC.esm.min.js';
 import Logger from '@/utils/Logger';
 import Utils from '@/utils/utils';
+import VERTC, {RTCDevice} from '@volcengine/rtc';
 
 const logger = new Logger('Settings');
 
 function mapStateToProps(state: AppState) {
   return {
+    user: state.user,
     mc: state.meetingControl.sdk,
-    settings: state.meetingSettings
+    settings: state.meetingSettings,
+    rtc: state.rtcClientControl.rtc
   };
 }
 
@@ -34,7 +37,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-export type SettingsModalProps = ConnectedProps<typeof connector> & WrappedComponentProps & { visible: boolean, close: () => void };
+export type SettingsModalProps = ConnectedProps<typeof connector> & WrappedComponentProps & { visible: boolean, close: () => void, };
 
 const commonCol = {
   labelCol: { span: 8 },
@@ -56,7 +59,9 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
     setCamera,
     setRealtimeParam,
     mc,
-    settings
+    settings,
+    user,
+    rtc: { engine },
   } = props;
 
   const initialValues = useMemo(() => {
@@ -71,6 +76,7 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
       camera,
       realtimeParam,
     } = settings;
+
     return {
       resolution: `${resolution.width} * ${resolution.height}`,
       shareResolution: `${shareResolution.width} * ${shareResolution.height}`,
@@ -78,8 +84,8 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
       shareFPS: shareFPS.max,
       BPS: BPS.max,
       shareBPS: shareBPS.max,
-      mic: mic || devices?.audioinput[0]?.deviceId,
-      camera : camera || devices?.videoinput[0]?.deviceId,
+      mic: mic || devices?.audioInputs[0].deviceId,
+      camera: camera || devices?.videoInputs[0]?.deviceId,
       realtimeParam,
     };
   }, [settings, devices]);
@@ -104,35 +110,93 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
     };
   };
 
-  const onOk = () => {
+  const onOk = async () => {
     const data = form.getFieldsValue(true);
-    setStreamSettings(formatStreamSettings(data.resolution, data.FPS, data.BPS, 250));
-    setScreenStreamSettings(formatStreamSettings(data.shareResolution, data.shareFPS, data.shareBPS, 800));
+    const streamConfigs = formatStreamSettings(data.resolution, data.FPS, data.BPS, 250);
+    const screenConfigs = formatStreamSettings(data.shareResolution, data.shareFPS, data.shareBPS, 800);
+
+    const isolation = ['width', 'height', 'max', 'min'];
+    const streamDiff = Utils.diff(settings.streamSettings, streamConfigs, isolation);
+    const screenDiff = Utils.diff(settings.screenStreamSettings, screenConfigs, isolation);
+
+    const caseToDo = (key: string, type: string) => {
+      switch(key) {
+        case 'frameRate':
+        case 'resolution':
+          engine.setVideoCaptureConfig({
+            frameRate: streamConfigs.frameRate.max,
+            ...streamConfigs.resolution,
+          });
+          break;
+        case 'bitrate':
+          if (type === 'stream') engine.setVideoEncoderConfig(StreamIndex.STREAM_INDEX_MAIN, [
+            {
+              maxKbps: streamConfigs.bitrate.max,
+            },
+          ]);
+          else engine.setVideoEncoderConfig(StreamIndex.STREAM_INDEX_SCREEN, [
+            {
+              maxKbps: screenConfigs.bitrate.max,
+            },
+          ]);
+          break;
+        default:
+          break;
+      }
+    };
+
+    //TODO 如果有变化, 则做对应的处理
+    for(const diffKey in streamDiff) {
+      caseToDo(diffKey, 'stream');
+    }
+    for(const diffKey in screenDiff) {
+      caseToDo(diffKey, 'screen');
+    }
+
+    if (settings.mic && settings.mic !== data.mic) {
+      await engine?.switchMicrophone(data.mic);
+    }
+    if (settings.camera  && settings.camera !== data.camera) {
+      await engine.switchCamera(data.camera);
+      engine.setLocalVideoMirrorType(1);
+    }
+
+    //TODO: 保存配置
+    setStreamSettings(streamConfigs);
+    setScreenStreamSettings(screenConfigs);
     setMic(data.mic);
     setCamera(data.camera);
     setRealtimeParam(data.realtimeParam);
     close();
   };
 
-  const getHistoryVideoRecord = () => {
+  const getHistoryVideoRecord = useCallback(() => {
     mc?.checkSocket().then(() => {
       mc?.getHistoryVideoRecord().then((res) => {
         setVideoList(res);
         setLoading(false);
       });
     });
-  };
+  },[mc]);
+
+  const devicesEmu = useCallback(async() =>{
+    const devices = await props.rtc.getDevices();
+    setDevices(devices);
+  },[props.rtc]);
 
   useEffect(() => {
-    RTC.getDevices(
-      (devices: DeviceInstance[]) => {
-        setDevices(Utils.sortDevice(devices));
-      },
-      (err: Error) => {
-        logger.error('err', err);
-      }
-    );
+    devicesEmu();
     getHistoryVideoRecord();
+    props.rtc.engine.on(VERTC.events.onMediaDeviceStateChanged, (e: RTCDevice) => {
+
+      if(e.deviceType === 'audioinput'){
+        setMic(e.deviceState === 'inactive' ? '' : e.deviceId);
+      }
+      if(e.deviceType === 'videoinput'){
+        setCamera(e.deviceState === 'inactive' ? '' :  e.deviceId);
+      }
+      devicesEmu();
+    });
   }, []);
 
   const myVideoList = useMemo(() => {
@@ -147,6 +211,9 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
       className={styles['settings-modal']}
       onCancel={close}
       onOk={onOk}
+      bodyStyle={{
+        minHeight: 400,
+      }}
     >
       <Form form={form} labelCol={{ span: 4 }} initialValues={initialValues}>
         <Row>
@@ -306,28 +373,20 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item
-          label="麦克风"
-          name="mic"
-          wrapperCol={{ span: 5 }}
-        >
-          <Select dropdownMatchSelectWidth={false}>
-            {devices?.audioinput.map((item) => (
+        <Form.Item label="麦克风" name="mic" wrapperCol={{ span: 5 }}>
+          <Select dropdownMatchSelectWidth={false} disabled={!user?.isMicOn}>
+            {devices?.audioInputs.map((item) => (
               <Select.Option value={item.deviceId} key={item.deviceId}>
-                {item.label}
+                {item.deviceName}
               </Select.Option>
             ))}
           </Select>
         </Form.Item>
-        <Form.Item
-          label="摄像头"
-          name="camera"
-          wrapperCol={{ span: 5 }}
-        >
-          <Select dropdownMatchSelectWidth={false}>
-            {devices?.videoinput.map((item) => (
+        <Form.Item label="摄像头" name="camera" wrapperCol={{ span: 5 }}>
+          <Select dropdownMatchSelectWidth={false} disabled={!user?.isCameraOn}>
+            {devices?.videoInputs.map((item) => (
               <Select.Option value={item.deviceId} key={item.deviceId}>
-                {item.label}
+                {item.deviceName}
               </Select.Option>
             ))}
           </Select>
@@ -342,15 +401,20 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
             loading={loading}
             onSelect={(url) => window.open(url as string, '_blank')}
           >
-            {videoList?.map((item) => {
-              return (
-                <Select.Option key={item.created_at} value={item.download_url}>
-                  {moment(item.created_at / 1000000).format(
-                    'YYYY-MM-DD HH:mm:ss'
-                  )}
-                </Select.Option>
-              );
-            })}
+            {videoList
+              ?.filter((i) => !i.video_holder)
+              .map((item) => {
+                return (
+                  <Select.Option
+                    key={item.created_at}
+                    value={item.download_url}
+                  >
+                    {moment(item.created_at / 1000000).format(
+                      'YYYY-MM-DD HH:mm:ss'
+                    )}
+                  </Select.Option>
+                );
+              })}
           </Select>
         </Form.Item>
         <Form.Item label="我的云录制" name="record" wrapperCol={{ span: 10 }}>

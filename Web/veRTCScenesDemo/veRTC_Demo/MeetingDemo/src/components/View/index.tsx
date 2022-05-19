@@ -6,14 +6,13 @@ import Logger from '@/utils/Logger';
 import type { ActiveMeetingUser } from '../../pages/Meeting/components/MeetingViews';
 import shareOffIcon from '/assets/images/shareOffIcon.png';
 import styles from './index.less';
-import { IRemoteAudioLevel } from '@/app-interfaces';
 
 type IViewProps = ActiveMeetingUser & {
   avatarOnCamOff?: React.ReactElement;
   sharingId?: string;
-  audioLevels?: IRemoteAudioLevel[] | undefined;
-  localVolume?: number;
+  volume: number;
   player: JSX.Element | undefined;
+  sharingView: boolean;
 };
 
 const logger = new Logger('view');
@@ -29,9 +28,9 @@ const View: React.FC<IViewProps> = ({
   avatarOnCamOff = null,
   sharingId = '',
   user_id,
-  audioLevels,
-  localVolume = 0,
+  volume,
   player,
+  sharingView,
 }) => {
   const [id] = useState<string>(uuid());
   const [layoutSize, containerRef] = useSize<HTMLDivElement>();
@@ -60,22 +59,16 @@ const View: React.FC<IViewProps> = ({
 
   const hasVolume = useCallback(() => {
     let res: boolean;
-    if (me && isMicOn && localVolume > 0.2) {
+    if (me && isMicOn && volume > 0) {
       res = true;
     } else {
-      const i = audioLevels?.find((item) => item?.userId === user_id);
-      if (i) {
-        res = i.RecvLevel > 0;
-      } else {
-        res = false;
-      }
+      res = volume > 0;
     }
     return res;
-  }, [audioLevels, isMicOn, localVolume, me, user_id]);
+  }, [volume, isMicOn, me]);
 
   const render = () => {
-
-    if (!isSharing && (!isCameraOn)) {
+    if (!sharingView && !isCameraOn) {
       return (
         <div className={styles.layoutWithoutCamera}>
           <div
@@ -117,7 +110,7 @@ const View: React.FC<IViewProps> = ({
         className={styles.streamContainer}
         id={id}
         style={{
-          display: isSharing || isCameraOn ? 'block' : 'none',
+          display: sharingView || isCameraOn ? 'block' : 'none',
         }}
       >
         {player}

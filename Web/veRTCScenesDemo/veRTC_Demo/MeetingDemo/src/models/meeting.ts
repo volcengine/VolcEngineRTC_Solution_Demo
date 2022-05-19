@@ -1,3 +1,4 @@
+import { IVolume } from './../app-interfaces';
 import {actionCreatorFactory} from 'dva-model-creator';
 import { AppModel } from '@/app-interfaces';
 import { setFieldReducer } from '@/utils/redux-utils';
@@ -32,6 +33,9 @@ export interface MeetingInfo {
    * 当前正在屏幕共享的用户ID
    */
   screen_shared_uid: string;
+  // hasTrackError: { kind: string; isScreen: boolean } | null;
+  localSpeaker: IVolume;
+  volumeSortList: IVolume[];
 }
 
 export interface MeetingUser {
@@ -68,12 +72,14 @@ export interface MeetingModelState {
   showStatus: boolean;
 
   viewMode: ViewMode;
+  localCaptureSuccess: boolean;
+  localAudioVideoCaptureSuccess: boolean;
   meetingInfo: MeetingInfo;
   meetingUsers: MeetingUser[];
-  orderMeetingUsers: MeetingUser[];
 
   status: 'end' | 'start' | 'init' | 'closeTips' | 'hidden' | 'lockTrackEnded';
   speakCollapse: boolean;
+  isSharing: boolean;
 }
 
 const meetingInitialState: MeetingModelState = {
@@ -99,6 +105,8 @@ const meetingInitialState: MeetingModelState = {
 
   viewMode: ViewMode.GalleryView,
 
+  localCaptureSuccess: false,
+  localAudioVideoCaptureSuccess: false,
   speakCollapse: false,
 
   meetingInfo: {
@@ -108,10 +116,16 @@ const meetingInitialState: MeetingModelState = {
     record: false,
     room_id: '',
     screen_shared_uid: '',
+    localSpeaker: {
+      volume: 0,
+      userId: '',
+    },
+    volumeSortList: []
+    // hasTrackError: null,
   },
   meetingUsers: [],
-  orderMeetingUsers: [],
-  status: 'init'
+  status: 'init',
+  isSharing: false,
 };
 
 const factory = actionCreatorFactory('meeting');
@@ -120,13 +134,19 @@ export const meetingActions = {
   setMeetingInfo: factory<MeetingModelState['meetingInfo']>('setMeetingInfo'),
   setMeetingUsers:
     factory<MeetingModelState['meetingUsers']>('setMeetingUsers'),
-  setMeetingOrderUsers: factory<MeetingModelState['meetingUsers']>(
-    'setMeetingOrderUsers'
-  ),
   setViewMode: factory<MeetingModelState['viewMode']>('setViewMode'),
   setMeetingStatus: factory<MeetingModelState['status']>('setMeetingStatus'),
   setSpeakCollapse:
     factory<MeetingModelState['speakCollapse']>('setSpeakCollapse'),
+  setLocalCaptureSuccess: factory<MeetingModelState['localCaptureSuccess']>(
+    'setLocalCaptureSuccess'
+  ),
+  setLocalAudioVideoCaptureSuccess: factory<
+    MeetingModelState['localAudioVideoCaptureSuccess']
+  >('setLocalAudioVideoCaptureSuccess'),
+  setMeetingIsSharing: factory<
+    MeetingModelState['isSharing']
+  >('setMeetingIsSharing'),
 };
 
 const MeetingModel: AppModel<MeetingModelState> = {
@@ -135,13 +155,18 @@ const MeetingModel: AppModel<MeetingModelState> = {
   reducers: {
     setMeetingInfo: setFieldReducer(meetingInitialState, 'meetingInfo'),
     setMeetingUsers: setFieldReducer(meetingInitialState, 'meetingUsers'),
-    setMeetingOrderUsers: setFieldReducer(
-      meetingInitialState,
-      'orderMeetingUsers'
-    ),
     setViewMode: setFieldReducer(meetingInitialState, 'viewMode'),
     setMeetingStatus: setFieldReducer(meetingInitialState, 'status'),
     setSpeakCollapse: setFieldReducer(meetingInitialState, 'speakCollapse'),
+    setLocalCaptureSuccess: setFieldReducer(
+      meetingInitialState,
+      'localCaptureSuccess'
+    ),
+    setLocalAudioVideoCaptureSuccess: setFieldReducer(
+      meetingInitialState,
+      'localAudioVideoCaptureSuccess'
+    ),
+    setMeetingIsSharing: setFieldReducer(meetingInitialState, 'isSharing'),
   },
 };
 export default MeetingModel;

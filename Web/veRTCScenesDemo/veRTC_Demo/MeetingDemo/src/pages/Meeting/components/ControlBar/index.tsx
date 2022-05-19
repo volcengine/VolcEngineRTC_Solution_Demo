@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Tooltip, message } from 'antd';
-import { UserModelState } from '@/models/user';
-import { MeetingModelState } from '@/models/meeting';
 import IconBtn from '@/components/IconBtn';
 import SettingsModal from '@/components/SettingsModal';
 import { modalWarning } from '@/pages/Meeting/components/MessageTips';
@@ -17,35 +15,89 @@ import recordOffIcon from '/assets/images/recordOffIcon.png';
 import usersIcon from '/assets/images/usersIcon.png';
 import settingIcon from '/assets/images/settingIcon.png';
 import endIcon from '/assets/images/endIcon.png';
+import { connector, injectProps, ConnectedProps } from '../../configs/config';
+import DeviceController from '@/lib/DeviceController';
 
 interface IControlBarProps {
-  currentUser: UserModelState;
-  meeting: MeetingModelState;
   openUsersDrawer: () => void;
-  changeMicState: (s: boolean) => void;
-  changeCameraState: (s: boolean) => void;
-  changeShareState: (s: boolean) => void;
   leaveMeeting: () => void;
-  recordMeeting: () => void;
 }
 
-const ControlBar: React.FC<IControlBarProps> = ({
-  currentUser,
-  meeting,
-  openUsersDrawer,
-  changeMicState,
-  changeCameraState,
-  changeShareState,
-  leaveMeeting,
-  recordMeeting,
-}) => {
+export type ControlBarProps = ConnectedProps<typeof connector> & IControlBarProps
+
+const ControlBar: React.FC<ControlBarProps> = (props) => {
+
+  const { currentUser, meeting, openUsersDrawer, leaveMeeting } = props;
+
+  const deviceController = useRef<DeviceController>(
+    new DeviceController(props)
+  );
+
   const commonProps = {
     width: 36,
     height: 36,
     style: { background: 'transparent', margin: 0 }
   };
 
+  /**
+   * @param visible 设置窗口是否可见
+   */
   const [ visible, setVisible ] = useState(false);
+
+  /**
+   * @brief 麦克风切换状态
+   * @function changeMicState
+   */
+  const changeMicState = useCallback((micState: boolean): void => {
+    if (deviceController.current) {
+      deviceController.current.changeAudioState(micState);
+    }
+  },[]);
+
+
+  /**
+   * @brief 摄像头切换状态
+   * @function changeCameraState
+   */
+  const changeCameraState = useCallback((cameraState: boolean): void => {
+    if (deviceController.current) {
+      deviceController.current.changeVideoState(cameraState);
+    }
+  }, []);
+
+  const changeShareState = (isShare: boolean) => {
+    const { meeting, settings } = props;
+    const param = {
+      meeting,
+      settings,
+    };
+    deviceController?.current.changeShareState(param, isShare);
+  };
+
+  /**
+   * @brief 会议录像
+   * @function recordMeeting
+   */
+  const recordMeeting = (): void => {
+    const { setMeetingInfo, meeting } = props;
+    const _users = meeting.meetingUsers.map((user) => user.user_id);
+    const screenUid = meeting.meetingInfo.screen_shared_uid;
+    try {
+      props.mc
+        ?.recordMeeting({
+          users: _users,
+          screen_uid: screenUid,
+        })
+        .then(() => {
+          setMeetingInfo({
+            ...meeting.meetingInfo,
+            record: true,
+          });
+        });
+    } catch (error) {
+      message.error(`${error}`);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -91,7 +143,7 @@ const ControlBar: React.FC<IControlBarProps> = ({
           onClick={() => changeShareState(!currentUser.isSharing)}
         >
           <Tooltip title="屏幕共享">
-            <img src={currentUser.isSharing ? shareOffIcon : shareOnIcon} />
+            <img src={!meeting.meetingInfo.screen_shared_uid ? shareOnIcon : shareOffIcon} />
           </Tooltip>
         </IconBtn>
       </div>
@@ -160,11 +212,10 @@ const ControlBar: React.FC<IControlBarProps> = ({
           </Tooltip>
         </IconBtn>
       </div>
-      {visible && (
-        <SettingsModal visible={visible} close={() => setVisible(false)} />
-      )}
+      {/* 设置 Modal */}
+      <SettingsModal visible={visible} close={() => setVisible(false)} />
     </div>
   );
 };
 
-export default ControlBar;
+export default injectProps(ControlBar);

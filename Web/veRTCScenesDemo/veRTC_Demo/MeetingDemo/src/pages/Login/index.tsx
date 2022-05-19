@@ -13,6 +13,7 @@ import Logger from '@/utils/Logger';
 import Utils from '@/utils/utils';
 import { StoreValue } from 'rc-field-form/lib/interface';
 import titleLogo from '/assets/images/titleLogo.png';
+import type { GetAppIDResponse } from '@/lib/socket-interfaces';
 
 const logger = new Logger('login');
 
@@ -42,6 +43,7 @@ function mapStateToProps(state: AppState) {
   return {
     currentUser: state.user,
     mc: state.meetingControl.sdk,
+    rtc: state.rtcClientControl.rtc
   };
 }
 
@@ -114,7 +116,19 @@ export class Login extends Component<LoginProps, LoginState> {
           .then((res) => {
             Utils.setLoginInfo(res);
             this.props.setLogged(true);
-            history.push('/');
+            this.props.mc?.getAppID({}).then((app?: GetAppIDResponse) => {
+              if (!app) {
+                return;
+              }
+              this.props.setAppId(app.app_id);
+              this.props.rtc.init({
+                config: {
+                  appId: app.app_id,
+                  uid: res.user_id,
+                },
+              });
+              history.push('/');
+            });
           })
           .catch( (error) =>{
             message.error(`${error}`);

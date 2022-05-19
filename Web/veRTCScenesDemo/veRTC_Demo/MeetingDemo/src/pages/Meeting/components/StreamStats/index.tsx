@@ -1,18 +1,20 @@
 import React, {
   FC,
-  useState,
-  useCallback,
-  useEffect,
+  useMemo
 } from 'react';
 import { Dispatch } from '@@/plugin-dva/connect';
 import { injectIntl } from 'umi';
 import { connect, bindActionCreators } from 'dva';
 import { userActions } from '@/models/user';
 import { meetingActions } from '@/models/meeting';
-import { AppState, Stream, IStreamStats } from '@/app-interfaces';
+import {
+  AppState,
+  IMeetingState,
+  LocalStats,
+  RemoteStats,
+} from '@/app-interfaces';
 import { ConnectedProps } from 'react-redux';
 import { WrappedComponentProps } from 'react-intl';
-import { useInterval } from '@/utils/hook';
 import Utils from '@/utils/utils';
 import styles from './index.less';
 
@@ -47,86 +49,82 @@ function mapDispatchToProps(dispatch: Dispatch) {
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type IProps = {
-  cameraStream: Stream | null;
-  remoteStreams: { [id: string]: Stream };
+  streamStatses: IMeetingState['streamStatses']
 };
+
+
+
 
 export type StatsProps = ConnectedProps<typeof connector> &
   WrappedComponentProps &
   IProps;
 
 const StreamStats: FC<StatsProps> = ({
-  remoteStreams, cameraStream,
   settings,
+  streamStatses,
 }) => {
-  const [interval, setInterval] = useState<number | null>(null);
-  const [localStats, setLocalStats] = useState<IStreamStats>();
-  const [remoteStats, setRemoteStats] = useState<IStreamStats>();
 
-  const getStreamStats = useCallback(() => {
-    if (cameraStream) {
-      setLocalStats({
-        ...cameraStream?.getStats(),
-      });
-    }
-    if (remoteStreams && Object.keys(remoteStreams).length) {
-      const remote = Object.values(remoteStreams)?.[0];
-      setRemoteStats({
-        ...remote?.getStats(),
-      });
-    }
-  }, [cameraStream, remoteStreams]);
+  const local = useMemo(
+    () => streamStatses.local,
+    [streamStatses.local]
+  ) as LocalStats;
 
-  useInterval(
-    () => {
-      getStreamStats();
-    },
-    interval,
-    { immediate: true }
-  );
-
-  useEffect(() => {
-    setInterval(settings?.realtimeParam ? 1000 : null);
-  }, [settings?.realtimeParam]);
+  const remote = useMemo(
+    () => streamStatses.remoteStreams,
+    [streamStatses.remoteStreams]
+  ) as { [key: string]: RemoteStats };
 
   return settings?.realtimeParam ? (
     <div className={styles['status']}>
       <div>[LOCAL]</div>
       <div>
         RES：
-        {`${localStats?.videoSentResolutionWidth || 0} * ${
-          localStats?.videoSentResolutionHeight || 0
+        {`${local?.videoStats.encodedFrameWidth || 0} * ${
+          local?.videoStats.encodedFrameHeight || 0
         }`}
       </div>
-      <div>FPS：{localStats?.videoSentFrameRate || 0}</div>
+      <div>FPS：{local?.videoStats.inputFrameRate || 0}</div>
       <div>
-        BIT(VIDEO)：{Utils.getThousand(localStats?.videoSentBitrate)}kbps
+        BIT(VIDEO)：{Utils.getThousand(local?.videoStats.sentKBitrate)}kbps
       </div>
       <div>
-        BIT(AUDIO)：{Utils.getThousand(localStats?.audioSentBitrate)}kbps
+        BIT(AUDIO)：{Utils.getThousand(local?.audioStats.sentKBitrate)}kbps
       </div>
 
-      <>
-        <div style={{ marginTop: 10 }}>[REMOTE]</div>
-        <div>RTT(VIDEO)：{remoteStats?.accessDelay ?? 0}ms</div>
-        <div>RTT(AUDIO)：{remoteStats?.accessDelay ?? 0}ms</div>
-        <div>CPU：0%|0%</div>
-        <div>
-          BIT(VIDEO)：{Utils.getThousand(remoteStats?.videoSentBitrate)}kbps
-        </div>
-        <div>
-          BIT(AUDIO): {Utils.getThousand(remoteStats?.audioSentBitrate)}kbps
-        </div>
-        <div>
-          RES：
-          {`${remoteStats?.videoReceivedResolutionWidth || 0} * ${
-            remoteStats?.videoReceivedResolutionHeight || 0
-          }`}
-        </div>
-        <div>FPS：{remoteStats?.videoSentFrameRate || 0}</div>
-        <div>LOSS（VEDIO）：{remoteStats?.videoReceivedPacketsLost || 0}%</div>
-        <div>LOSS(AUDIO)：{remoteStats?.audioReceivedPacketsLost || 0}%</div>
-      </>
+      {Object.keys(remote).map((i) => {
+        const remoteStats = remote[i];
+        return (
+          <>
+            <div style={{ marginTop: 10 }}>[REMOTE]{i}</div>
+            <div>RTT(VIDEO)：{remoteStats?.videoStats.e2eDelay ?? 0}ms</div>
+            <div>RTT(AUDIO)：{remoteStats?.audioStats.e2eDelay ?? 0}ms</div>
+            <div>CPU：0%|0%</div>
+            <div>
+              BIT(VIDEO)：
+              {Utils.getThousand(remoteStats?.videoStats.receivedKBitrate)}kbps
+            </div>
+            <div>
+              BIT(AUDIO):{' '}
+              {Utils.getThousand(remoteStats?.audioStats.receivedKBitrate)}kbps
+            </div>
+            <div>
+              RES：
+              {`${remoteStats?.videoStats.width || 0} * ${
+                remoteStats?.videoStats.height || 0
+              }`}
+            </div>
+            <div>
+              FPS：{remoteStats?.videoStats.decoderOutputFrameRate || 0}
+            </div>
+            <div>
+              LOSS（VEDIO）：{remoteStats?.videoStats.videoLossRate || 0}%
+            </div>
+            <div>
+              LOSS(AUDIO)：{remoteStats?.audioStats.audioLossRate || 0}%
+            </div>
+          </>
+        );
+      })}
     </div>
   ) : null;
 };

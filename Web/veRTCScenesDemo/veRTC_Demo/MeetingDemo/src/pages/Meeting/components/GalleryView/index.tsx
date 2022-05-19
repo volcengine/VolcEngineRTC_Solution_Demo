@@ -85,7 +85,11 @@ const GalleryView: React.FC<IGalleryViewProps> = ({ views }) => {
     return [];
   };
 
-  return <div className={styles.container}>{renderViews()}</div>;
+  return (
+    <div className={styles.container}>
+      {renderViews()}
+    </div>
+  );
 };
 
 export default GalleryView;

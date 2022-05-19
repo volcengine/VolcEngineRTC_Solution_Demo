@@ -10,6 +10,7 @@ import { userActions } from '@/models/user';
 import Logger from '@/utils/Logger';
 import Utils from '@/utils/utils';
 import { TOASTS } from '@/config';
+import type { GetAppIDResponse } from '@/lib/socket-interfaces';
 
 export interface AuthProps {
   children: React.ReactNode;
@@ -24,6 +25,8 @@ function mapStateToProps(state: AppState) {
     currentUser: state.user,
     mc: state.meetingControl.sdk,
     logged: state.user.logged,
+    rtc: state.rtcClientControl.rtc,
+    user: state.user,
   };
 }
 
@@ -44,6 +47,25 @@ const login_userId = Utils.getLoginUserId() || '';
 const Auth = (props: LoginProps) => {
   const [loading, setLoading] = useState(true);
 
+  const initWithAppID = (login_userId: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      props.mc?.getAppID({}).then((app?: GetAppIDResponse) => {
+        if (!app) {
+          reject();
+          return;
+        }
+        props.setAppId(app.app_id);
+        props.rtc.init({
+          config: {
+            appId: app.app_id,
+            uid: login_userId,
+          },
+        });
+        resolve();
+      });
+    });
+  };
+
   const verifyLoginToken = () => {
     props.mc
       ?.verifyLoginToken({})
@@ -51,13 +73,16 @@ const Auth = (props: LoginProps) => {
         logger.debug('verifyLoginToken: %o', res);
         props.setUserName(login_name);
         props.setUserId(login_userId);
-        props.setLogged(true);
+        initWithAppID(login_userId).finally(() => {
+          props.setLogged(true);
+          setLoading(false);
+        });
       })
       .catch((err) => {
         props.setLogged(false);
         logger.error(err);
-      })
-      .finally(() => setLoading(false));
+        setLoading(false);
+      });
   };
 
   useEffect(() => {

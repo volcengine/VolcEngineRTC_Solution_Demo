@@ -1,15 +1,8 @@
 import React, { Component, ReactNode } from 'react';
-import RTC from '@/sdk/VRTC.esm.min.js';
-import { Dispatch } from '@@/plugin-dva/connect';
-import { injectIntl, history } from 'umi';
-import { connect, bindActionCreators } from 'dva';
-import { ConnectedProps } from 'react-redux';
+import { history } from 'umi';
 import { FormInstance } from 'antd/es/form';
 import { Form, Input, Button, Tooltip, Modal } from 'antd';
 import { WrappedComponentProps } from 'react-intl';
-import { userActions } from '@/models/user';
-import { meetingActions } from '@/models/meeting';
-import { AppState, Stream } from '@/app-interfaces';
 import Logger from '@/utils/Logger';
 import SettingsModal from '@/components/SettingsModal';
 import FeedBack from '@/components/FeedBack';
@@ -26,24 +19,9 @@ import icon from '/assets/images/icon-256@2x.png';
 import Utils from '@/utils/utils';
 import { StoreValue } from 'rc-field-form/lib/interface';
 import { modalWarning } from '@/pages/Meeting/components/MessageTips';
-import Player from '../Meeting/components/Player';
-
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.user,
-    settings: state.meetingSettings,
-    meeting: state.meeting,
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch) {
-  return {
-    dispatch,
-    ...bindActionCreators({ ...userActions, ...meetingActions }, dispatch),
-  };
-}
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
+import { LocalPlayer } from '../Meeting/components/MediaPlayer';
+import { injectProps, ConnectedProps, connector } from '../Meeting/configs/config';
+import DeviceController from '@/lib/DeviceController';
 
 const logger = new Logger('JoinRoom');
 
@@ -54,7 +32,9 @@ export interface LoginState {
   nameErrType: ERROR_TYPES;
   roomIdErrType: ERROR_TYPES;
   settingsVisible: boolean;
-  cameraStream: Stream | null;
+  cameraStream: {
+    playerComp: JSX.Element;
+  } | null;
 }
 
 enum ERROR_TYPES {
@@ -76,6 +56,11 @@ export class Login extends Component<LoginProps, LoginState> {
 
   formRef = React.createRef<FormInstance>();
 
+  /**
+   *设备通用方法
+   */
+  deviceLib = new DeviceController(this.props);
+
   get nameHasErr(): boolean {
     return this.state.nameErrType !== ERROR_TYPES.VALID;
   }
@@ -84,96 +69,31 @@ export class Login extends Component<LoginProps, LoginState> {
     return this.state.roomIdErrType !== ERROR_TYPES.VALID;
   }
 
-  componentDidUpdate(prevProps: LoginProps): void {
-    if ( this.props.settings && prevProps.settings.streamSettings !== this.props.settings.streamSettings) {
-      if (this.state.cameraStream) {
-        this.state.cameraStream.setVideoEncoderConfiguration(
-          this.props.settings.streamSettings
-        );
-      }
-    }
-
-    if (this.props.settings?.camera !== prevProps.settings?.camera || this.props.settings?.mic !== prevProps.settings?.mic) {
-      this.openCamera();
-    }
-  }
-
-  openCamera(): void{
+  componentDidMount(): void {
     const {
-      user: { isCameraOn, isMicOn },
-      settings,
+      currentUser,
+      settings
     } = this.props;
 
-    const stream = RTC.createStream({
-      video: true,
-      audio: true,
-      microphoneId: settings?.mic,
-      cameraId: settings?.camera,
-    });
-
-    stream.setVideoEncoderConfiguration(settings.streamSettings);
-
-    stream.init(() => {
-      logger.debug('stream init success');
-      if (isCameraOn) {
-        stream.unmuteVideo();
-      } else {
-        stream.muteVideo();
-      }
-      if (isMicOn) {
-        stream.unmuteAudio();
-      } else {
-        stream.muteAudio();
-      }
-
-      const player = <Player stream={stream} />;
-      stream.playerComp = player;
-
-      this.setState({ cameraStream: stream });
-    });
-  }
-
-  componentDidMount(): void {
-
-    this.openCamera();
-
-    RTC.checkAudioPermission(
-      () => {
-        this.props.setDeviceAccess({
-          ...this.props.user.deviceAccess,
-          audio: true,
-        });
-      },
-      (err: Error) => {
-        this.props.setIsMicOn(false);
-        this.props.setDeviceAccess({
-          ...this.props.user.deviceAccess,
-          audio: false,
-          audioMessage: err.toString()?.includes('Permission')
-            ? 'mic_right'
-            : 'mic_setting_right',
-        });
-      }
-    );
-
-    RTC.checkVideoPermission(
-      () => {
-        this.props.setDeviceAccess({
-          ...this.props.user.deviceAccess,
-          video: true,
-        });
-      },
-      (err: Error) => {
-        this.props.setIsCameraOn(false);
-        this.props.setDeviceAccess({
-          ...this.props.user.deviceAccess,
-          video: false,
-          videoMessage: err.toString()?.includes('Permission denied')
-            ? 'car_right'
-            : 'car_setting_right',
-        });
-      }
-    );
+    const param = {
+      currentUser,
+      settings,
+    };
+    this.props.rtc.createEngine();
+    this.deviceLib.openCamera(param, () => {
+      this.props.setLocalAudioVideoCaptureSuccess(true);
+      this.setState({
+        cameraStream: {
+          playerComp: (
+            <LocalPlayer
+              localCaptureSuccess={true}
+              rtc={this.props.rtc}
+              renderDom="local-preview-player"
+            />
+          ),
+        },
+      });
+    }, false);
   }
 
   /**
@@ -218,7 +138,6 @@ export class Login extends Component<LoginProps, LoginState> {
           this.props.setRoomId(roomId);
           this.props.setUserName(userName);
           if (this.state.cameraStream) {
-            this.state.cameraStream.close();
             this.setState({ cameraStream: null });
           }
           const loginInfo = Utils.getLoginInfo();
@@ -227,9 +146,7 @@ export class Login extends Component<LoginProps, LoginState> {
             Utils.setLoginInfo(loginInfo);
           }
           this.props.setMeetingStatus('start');
-          history.push(
-            `/meeting?roomId=${roomId}&username=${userName}`
-          );
+          history.push(`/meeting?roomId=${roomId}&username=${userName}`);
         });
       } catch (e) {
         logger.error(e);
@@ -241,24 +158,27 @@ export class Login extends Component<LoginProps, LoginState> {
   onAudioClick = (): void => {
     const {
       deviceAccess: { audio, audioMessage },
-    } = this.props.user;
-
+      isMicOn,
+    } = this.props.currentUser;
     if (!audio) {
       audioMessage && modalWarning(audioMessage);
       return;
     }
-    this.props.setIsMicOn(!this.props.user.isMicOn);
+    this.props.rtc.changeAudioState(!isMicOn);
+    this.props.setIsMicOn(!isMicOn);
   };
 
   onVideoClick = (): void => {
     const {
       deviceAccess: { video, videoMessage },
-    } = this.props.user;
+      isCameraOn,
+    } = this.props.currentUser;
     if (!video) {
       videoMessage && modalWarning(videoMessage);
       return;
     }
-    this.props.setIsCameraOn(!this.props.user.isCameraOn);
+    this.props.rtc.changeVideoState(!isCameraOn);
+    this.props.setIsCameraOn(!isCameraOn);
   };
 
   openSettings = (): void => {
@@ -283,14 +203,13 @@ export class Login extends Component<LoginProps, LoginState> {
 
   render(): ReactNode {
     const {
-      user: { isCameraOn, isMicOn },
+      currentUser: { isCameraOn, isMicOn },
       meeting: { status },
     } = this.props;
 
     return (
       <div className={styles['join-room-container']}>
         <View
-          stream={this.state.cameraStream}
           player={this.state.cameraStream?.playerComp}
           is_host={false}
           is_sharing={false}
@@ -301,9 +220,10 @@ export class Login extends Component<LoginProps, LoginState> {
           user_id="void"
           user_name=""
           user_uniform_id=""
+          volume={0}
+          sharingView={false}
           avatarOnCamOff={<img style={{ width: '50%' }} src={camPause} />}
         />
-
         <div className={styles['login-toolbar']}>
           <Form
             layout="inline"
@@ -388,7 +308,9 @@ export class Login extends Component<LoginProps, LoginState> {
                   <Button
                     type={'primary'}
                     onClick={this.onLogin}
-                    disabled={!this.props.user.network || !roomId || !userName}
+                    disabled={
+                      !this.props.currentUser.network || !roomId || !userName
+                    }
                   >
                     进入房间
                   </Button>
@@ -426,34 +348,38 @@ export class Login extends Component<LoginProps, LoginState> {
               close={() => this.setState({ settingsVisible: false })}
             />
           ) : undefined}
-          <FeedBack status={status} />
+          {process.env.NODE_ENV !== 'development' && (
+            <FeedBack status={status} />
+          )}
         </div>
-        <Modal
-          visible={status === 'init'}
-          footer={null}
-          closable={false}
-          maskClosable={false}
-          width={280}
-          className={styles['modal']}
-          bodyStyle={{ fontSize: 12, background: '#ddd' }}
-        >
-          <div className={styles['icon']}>
-            <img src={icon} />
-          </div>
-          <p className={styles['tips']}>
-            本产品仅用于功能体验，单次会议时长不超过10分钟
-          </p>
-          <Button
-            onClick={() => this.props.setMeetingStatus('closeTips')}
-            type="primary"
-            block
+        {process.env.NODE_ENV !== 'development' && (
+          <Modal
+            visible={status === 'init'}
+            footer={null}
+            closable={false}
+            maskClosable={false}
+            width={280}
+            className={styles['modal']}
+            bodyStyle={{ fontSize: 12, background: '#ddd' }}
           >
-            确定
-          </Button>
-        </Modal>
+            <div className={styles['icon']}>
+              <img src={icon} />
+            </div>
+            <p className={styles['tips']}>
+              本产品仅用于功能体验，单次会议时长不超过10分钟
+            </p>
+            <Button
+              onClick={() => this.props.setMeetingStatus('closeTips')}
+              type="primary"
+              block
+            >
+              确定
+            </Button>
+          </Modal>
+        )}
       </div>
     );
   }
 }
 
-export default connector(injectIntl(Login));
+export default injectProps(Login);
