@@ -1,4 +1,3 @@
-import RTC from '@/sdk/VRTC.esm.min.js';
 import io from 'socket.io-client';
 import { EventEmitter } from 'eventemitter3';
 import { v4 as uuid } from 'uuid';
@@ -8,6 +7,7 @@ import Logger from '@/utils/Logger';
 import type { MeetingInfo, MeetingUser } from '@/models/meeting';
 import { Stream, RTCClint, ConnectStatus } from '@/app-interfaces';
 import { TOASTS } from '@/config';
+import VRTC from '@volcengine/rtc';
 
 import type {
   SocketResponse,
@@ -46,9 +46,6 @@ class MettingController extends EventEmitter {
   private _isHost: boolean;
   private socket!: Socket;
   private client!: RTCClint;
-  private count = 8; //订阅远端流数量 8 + 1（本地流） = 9
-  private _streams: IStreams = {};
-  private streamRecord: SubscribePatch = { subscribed: [], unsubscribed: [] };
   private reconnect!: boolean;
   private eventListenNames: string[] = [
     'onUserMicStatusChange',
@@ -84,7 +81,7 @@ class MettingController extends EventEmitter {
         query: {
           wsid: uuid(),
           appid: 'veRTCDemo',
-          ua: `web-${RTC.version}`,
+          ua: `web-${VRTC.getSdkVersion()}`,
           did: Utils.getDeviceId(),
         },
         path: SOCKETPATH,
@@ -97,13 +94,8 @@ class MettingController extends EventEmitter {
       }
 
       this.socket.on('connect', () => {
-        if (!this.client) {
-          this.client = RTC.createClient({
-            iceUrl: process.env.ICEURL,
-          });
-          this._handleSocket();
-          this._handleRTCEvents();
-        }
+
+        this._handleSocket();
 
         if (this.reconnect) {
           this.userReconnect().then((res) => {
@@ -112,8 +104,8 @@ class MettingController extends EventEmitter {
           this.reconnect = false;
         }
 
-        RTC.Logger.setLogLevel(RTC.Logger.DEBUG);
-        logger.debug('client: %o', this.client);
+        // RTC.Logger.setLogLevel(RTC.Logger.DEBUG);
+        // logger.debug('client: %o', this.client);
 
         resolve(this.socket.id);
       });
@@ -177,22 +169,7 @@ class MettingController extends EventEmitter {
         p
       )
         .then((response) => {
-          this.client.init(p.app_id, () => {
-            this.client.join(
-              response.token,
-              p.room_id,
-              p.user_id,
-              (uid: string) => {
-                logger.debug('RTC Room uid: ' + uid);
-                resolve(response);
-              },
-              (err: unknown) => {
-                logger.error(err);
-                reject(err);
-              }
-            );
-          });
-          return response;
+          resolve(response);
         })
         .catch(reject);
     });
@@ -219,37 +196,17 @@ class MettingController extends EventEmitter {
 
   public leaveMeeting(payload: VerifyLoginToken): Promise<null> {
     return new Promise((resolve, reject) => {
-      this.clientLeave(
-        () => {
-          this.sendSignaling('leaveMeeting', payload).finally(() => {
-            this.disconnect();
-            resolve(null);
-          });
-        },
-        () => {
-          reject('Leave RTC Room failed');
-        }
-      );
-    });
-  }
-
-  public clientLeave(success: () => void, fail?: () => void): void {
-    this.client.leave(success, fail);
-  }
-
-  public getRemoteAudioStats(): Promise<AudioStats> {
-    return new Promise((resolve) => {
-      this.client.getRemoteAudioStats((param) => {
-        resolve(param);
+      // this.clientLeave(
+        // () => {
+      this.sendSignaling('leaveMeeting', payload).finally(() => {
+        this.disconnect();
+        resolve(null);
       });
-    });
-  }
-
-  public getLocalAudioStats(): Promise<AudioStats> {
-    return new Promise((resolve) => {
-      this.client.getLocalAudioStats((param) => {
-        resolve(param);
-      });
+        // },
+        // () => {
+        //   reject('Leave RTC Room failed');
+        // }
+      // );
     });
   }
 
@@ -347,10 +304,10 @@ class MettingController extends EventEmitter {
     });
   }
 
-  public publish(stream: Stream): void {
-    this._assertNotInRoom();
-    this.client.publish(stream);
-  }
+  // public publish(stream: Stream): void {
+  //   this._assertNotInRoom();
+  //   this.client.publish(stream);
+  // }
 
   public unpublish(stream: Stream): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -361,14 +318,6 @@ class MettingController extends EventEmitter {
         reject();
       }
     });
-  }
-
-  public subscribe(stream: Stream, option?: SubscribeOption): void {
-    this._assertNotInRoom();
-    this.client.subscribe(
-      stream,
-      Object.assign(option || {}, { forceSubscribe: true })
-    );
   }
 
   public getConnectStatus(): ConnectStatus {
@@ -402,49 +351,6 @@ class MettingController extends EventEmitter {
     }
   }
 
-  public changSubscribe(newUserSort: MeetingUser[]): void {
-    newUserSort.forEach((i, index) => {
-      if (!this._streams[i.user_id] || !i.user_id) {
-        return;
-      }
-      const subscribe_index = this.streamRecord?.subscribed?.findIndex(
-        (item) => item === i.user_id
-      );
-      const unsubscribe_index = this.streamRecord?.unsubscribed?.findIndex(
-        (item) => item === i.user_id
-      );
-
-      if (index <= this.count) {
-        if (subscribe_index === -1) {
-          this.streamRecord?.subscribed?.push(i.user_id);
-          this.subscribe(this._streams[i.user_id], {
-            audio: true,
-            video: true,
-          });
-        }
-        if (unsubscribe_index !== -1) {
-          this.streamRecord?.unsubscribed?.splice(unsubscribe_index, 1);
-        }
-      }
-      if (index > this.count) {
-        if (unsubscribe_index === -1) {
-          this.streamRecord?.unsubscribed?.push(i.user_id);
-          this.subscribe(this._streams[i.user_id], {
-            audio: true,
-            video: false,
-          });
-        }
-        if (subscribe_index !== -1) {
-          this.streamRecord?.subscribed?.splice(subscribe_index, 1);
-        }
-      }
-    });
-  }
-
-  public cleanStreamRecord(): void {
-    this.streamRecord = { subscribed: [], unsubscribed: [] };
-  }
-
   private _handleSocket() {
     logger.debug('_handleSocket()');
 
@@ -461,33 +367,6 @@ class MettingController extends EventEmitter {
     });
   }
 
-  private _handleRTCEvents() {
-    logger.debug('_handleRTCEvents()');
-
-    this.client.on('stream-added', (payload: { stream: Stream }) => {
-      logger.debug('stream-added: %o', payload);
-      this.subscribe(payload.stream);
-    });
-
-    this.client.on('stream-subscribed', (payload: { stream: Stream }) => {
-      logger.debug('stream-subscribed: %o', payload);
-      this.emit('OnReceivedStream', payload.stream);
-    });
-
-    this.client.on('stream-removed', (payload: { stream: Stream }) => {
-      logger.debug('stream-removed: %o', payload);
-      this.emit('onRemoveStream', {
-        uid: payload.stream.getId(),
-        screen: payload.stream.stream.screen,
-      });
-    });
-
-    // this.client.on('peer-leave', (payload: { uid: string }) => {
-    //   logger.debug('stream-removed: %o', payload);
-    //   this.emit('onUserLeaveMeetingClient', payload.uid);
-    // });
-  }
-
   private _assertNotHost() {
     if (!this._isHost) {
       throw new Error('Permission Denied');
@@ -498,10 +377,6 @@ class MettingController extends EventEmitter {
     if (!this.client || this.client.getConnectionState() !== 'CONNECTED') {
       throw new Error('Not in RTC Room');
     }
-  }
-
-  set streams(v: IStreams) {
-    this._streams = v;
   }
 
   set isHost(v: boolean) {

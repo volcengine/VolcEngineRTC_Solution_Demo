@@ -1,16 +1,24 @@
 import { UserModelState } from './models/user';
 import { MeetingModelState } from './models/meeting';
 import { MeetingSettingsState } from './models/meeting-settings';
+import { RTCClientControlModelState } from './models/meeting-client';
+
 import { MeetingControlModelState } from '@@/plugin-dva/connect';
 import {ImmerReducer} from '@@/plugin-dva/connect';
 import {Action} from 'dva-model-creator';
 import {EffectsMapObject, SubscriptionsMapObject} from 'dva';
 import { AudioStats } from '@/lib/socket-interfaces';
+import {
+  RTCStream,
+} from '@volcengine/rtc';
+import { ConnectedProps, connector } from '@/pages/Meeting/configs/config';
+
 export interface AppState {
-  user: UserModelState,
-  meeting: MeetingModelState,
-  meetingControl: MeetingControlModelState,
-  meetingSettings: MeetingSettingsState,
+  user: UserModelState;
+  meeting: MeetingModelState;
+  meetingControl: MeetingControlModelState;
+  meetingSettings: MeetingSettingsState;
+  rtcClientControl: RTCClientControlModelState;
 }
 
 export interface AppModel<S> {
@@ -58,22 +66,18 @@ export type IStreamStats = {
 };
 
 export interface Stream {
-  uid: string;
-  stream: {
-    screen: boolean;
-  };
-  getId: () => string;
-  enableAudio: () => void;
-  disableAudio: () => void;
-  enableVideo: () => void;
-  disableVideo: () => void;
-  close: () => void;
-  init: (onSuccess: () => void, onFailure: (err: Error) => void) => void;
-  play: (id: string, options?: { fit?: FitType; muted?: boolean }) => void;
-  setVideoEncoderConfiguration: (options: EncoderConfiguration) => void;
-  getStats(): IStreamStats;
-  getAudioLevel(): number;
-  playerComp: JSX.Element;
+  hasAudio: boolean;
+  hasVideo: boolean;
+  isScreen: boolean;
+  userId: string;
+  playerComp?: JSX.Element;
+  videoStreamDescriptions: {
+    framerate: number;
+    height: number;
+    maxkbps: number;
+    rid: string;
+    width: number;
+  }[];
 }
 
 type SubscribeOption = {
@@ -120,15 +124,101 @@ export interface ConnectStatus {
 
 export interface DeviceInstance {
   deviceId: string;
-  groupId: string;
-  kind: 'audioinput' | 'audiooutput' | 'videoinput';
-  label: string;
+  deviceInfo: {
+    deviceId: string;
+    groupId: string;
+    kind: string;
+    label: string;
+  };
+  deviceName: string;
+  deviceState: string;
+  deviceType: string;
 }
 
 export type DeviceItems = {
-  audioinput : DeviceInstance[];
-  videoinput : DeviceInstance[];
-  audiooutput : DeviceInstance[];
+  audioInputs: DeviceInstance[];
+  videoInputs: DeviceInstance[];
+  audioPlaybackList: DeviceInstance[];
+};
+
+export interface IVolume {
+  volume: number;
+  userId: string;
 }
 
-export type IRemoteAudioLevel = { userId: string | null; RecvLevel: number };
+export interface IMeetingState {
+  usersDrawerVisible: boolean;
+  cameraStream: RTCStream | null;
+  screenStream: boolean;
+  remoteStreams: { [id: string]: RTCStream };
+  leaving: boolean;
+  localVolume: number;
+  refresh: boolean;
+  volumeSortList: IVolume[];
+  localSpeaker: IVolume;
+  streamStatses: {
+    local: any;
+    localScreen: any;
+    remoteStreams: {
+      [key: string]: any;
+    };
+  };
+  users: any[];
+}
+
+
+export type MeetingProps = ConnectedProps<typeof connector>
+
+
+export type LocalStats = {
+  audioStats: {
+    audioLossRate: number;
+    numChannels: number;
+    recordSampleRate: number;
+    rtt: number;
+    sentKBitrate: number;
+    statsInterval: number;
+  };
+  isScreen: boolean;
+  videoStats: {
+    codecType: string;
+    encodedFrameCount: number;
+    encodedFrameHeight: number;
+    encodedFrameWidth: number;
+    encoderOutputFrameRate: number;
+    inputFrameRate: number;
+    isScreen: boolean;
+    rtt: number;
+    sentFrameRate: number;
+    sentKBitrate: number;
+    statsInterval: number;
+    videoLossRate: number;
+  };
+};
+
+export type RemoteStats = {
+  audioStats: {
+    audioLossRate: number;
+    concealedSamples: number;
+    concealmentEvents: number;
+    e2eDelay: number;
+    jitterBufferDelay: number;
+    numChannels: number;
+    receivedKBitrate: number;
+    receivedSampleRate: number;
+    recordSampleRate: number;
+    statsInterval: number;
+  };
+  isScreen: boolean;
+  userId: string;
+  videoStats: {
+    decoderOutputFrameRate: number;
+    e2eDelay: number;
+    height: number;
+    isScreen: boolean;
+    receivedKBitrate: number;
+    statsInterval: number;
+    videoLossRate: number;
+    width: number;
+  };
+};

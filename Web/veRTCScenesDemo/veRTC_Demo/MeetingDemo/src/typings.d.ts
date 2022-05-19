@@ -1,5 +1,3 @@
-declare module '@/sdk/VRTC.esm.min.js';
-
 interface Window {
   __mc: any;
   __meeting: any;

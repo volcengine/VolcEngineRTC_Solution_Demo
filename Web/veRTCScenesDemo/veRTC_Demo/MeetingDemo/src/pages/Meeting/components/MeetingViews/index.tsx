@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { UserModelState } from '@/models/user';
-import { MeetingModelState, MeetingUser } from '@/models/meeting';
-import { ViewMode, meetingActions } from '@/models/meeting';
-import { Stream, AppState } from '@/app-interfaces';
+import { MeetingUser } from '@/models/meeting';
+import { ViewMode } from '@/models/meeting';
+import { Stream } from '@/app-interfaces';
 import View from '@/components/View';
 import Logger from '@/utils/Logger';
-import { Dispatch } from '@@/plugin-dva/connect';
-import { connect, bindActionCreators } from 'dva';
-import { injectIntl } from 'umi';
-import { ConnectedProps } from 'react-redux';
 import { WrappedComponentProps } from 'react-intl';
-import { IRemoteAudioLevel } from '@/app-interfaces';
+import { injectProps, ConnectedProps, connector } from '../../configs/config';
+import { LocalPlayer, ShareView } from '../../components/MediaPlayer';
 
 import GalleryView from '../GalleryView';
 import SpeakerView from '../SpeakerView';
@@ -18,60 +15,33 @@ import styles from './index.less';
 
 interface IMeetingViewsProps {
   currentUser: UserModelState;
-  meeting: MeetingModelState;
   cameraStream: Stream | null;
-  screenStream: Stream | null;
+  screenStream: boolean;
   remoteStreams: { [id: string]: Stream };
-  audioLevels: IRemoteAudioLevel[];
-  localVolume: number;
 }
 
 const logger = new Logger('MeetingViews');
 export interface ActiveMeetingUser extends MeetingUser {
-  stream: Stream | null;
   me?: boolean;
   speaking?: boolean;
 }
 
-function mapStateToProps(state: AppState) {
-  return {
-    mc: state.meetingControl.sdk,
-    // meeting: state.meeting,
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch) {
-  return {
-    dispatch,
-    ...bindActionCreators({ ...meetingActions }, dispatch),
-  };
-}
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
+const HiddenVideo: React.FC<{
+  views: React.ReactNode[];
+}> = ({ views }) => {
+  return (
+    <div className={styles['videoHidden']}>
+      {views.map((view) => {
+        return <>{view}</>;
+      })}
+    </div>
+  );
+};
 
 export type MeetingViewsProps = ConnectedProps<typeof connector> &
   WrappedComponentProps &
   IMeetingViewsProps;
 
-
-const HiddenVideo: React.FC<{
-  users: MeetingUser[];
-  remoteStreams: {
-    [id: string]: Stream;
-  };
-}> = ({ users, remoteStreams }) => {
-  return (
-    <div className={styles['videoHidden']}>
-      {users.map((item) => {
-        const stream = remoteStreams[item.user_id];
-        if (stream?.playerComp) {
-          return stream.playerComp;
-        }
-        return <div key={item.user_id}></div>;
-      })}
-    </div>
-  );
-};
 
 const MeetingViews: React.FC<MeetingViewsProps> = (props) => {
   const {
@@ -80,121 +50,154 @@ const MeetingViews: React.FC<MeetingViewsProps> = (props) => {
     cameraStream,
     screenStream,
     remoteStreams,
-    audioLevels,
-    localVolume,
   } = props;
   const [activeUsersViews, updateActiveUsersViews] = useState<React.ReactNode[]>([]);
   const [screenView, updateScreenView] = useState<React.ReactNode>(null);
+  const [localView, updateLocalView] = useState<React.ReactNode>(null);
 
   useEffect(() => {
-    if (meeting.orderMeetingUsers?.length) {
+    const volumeSortList = meeting.meetingInfo.volumeSortList;
+    if (volumeSortList?.length) {
       //按声音大小来排序
-      const activeUsersViews = meeting.orderMeetingUsers
-        ?.slice(0, meeting.viewMode === ViewMode.GalleryView ? 9 : 8)
-        .map((activeUser) => {
-          const me = activeUser.user_id === currentUser.userId;
+      const activeUsersViews = volumeSortList
+        .map(({ userId, volume }) => {
           const localProps: any = {};
-          let stream: Stream | null = null;
-
-          if (me && cameraStream) {
-            stream = cameraStream;
-          } else {
-            stream = remoteStreams[activeUser.user_id];
-          }
-
-          logger.debug(
-            'user_id: %s, stream: %o',
-            activeUser.user_id,
-            stream
+          const activeUser = meeting.meetingUsers.find(
+            (i) => i.user_id === `${userId}`
           );
-
-          if (me) {
-            localProps.is_camera_on = currentUser.isCameraOn;
-            localProps.is_mic_on = currentUser.isMicOn;
-          }
-          return (
+          return activeUser ? (
             <View
-              player={stream?.playerComp}
-              key={activeUser.user_id}
-              me={me}
-              stream={stream}
-              speaking={activeUser.is_mic_on}
-              audioLevels={audioLevels}
+              player={remoteStreams[userId]?.playerComp}
+              key={userId}
+              me={false}
+              speaking={activeUser?.is_mic_on || false}
+              volume={volume ?? 0}
               {...activeUser}
               {...localProps}
               is_sharing={false}
               sharingId={meeting.meetingInfo.screen_shared_uid}
-              count={meeting.orderMeetingUsers?.length}
-              localVolume={localVolume}
+              count={volumeSortList?.length}
+              sharingView={false}
             />
-          );
+          ) : null;
         });
-      updateActiveUsersViews(activeUsersViews);
+      updateActiveUsersViews(activeUsersViews.filter((i) => i));
     }
-  }, [meeting.viewMode, meeting.meetingUsers, cameraStream, currentUser, remoteStreams, audioLevels, meeting.meetingInfo.screen_shared_uid, localVolume, meeting.orderMeetingUsers]);
+  }, [
+    meeting.viewMode,
+    meeting.meetingUsers,
+    cameraStream,
+    currentUser,
+    remoteStreams,
+    meeting.meetingInfo.screen_shared_uid,
+    meeting.meetingInfo
+  ]);
 
+  //分享流View
   useEffect(() => {
-    if (screenStream) {
+    if (
+      meeting.viewMode === ViewMode.SpeakerView &&
+      meeting.meetingInfo.screen_shared_uid &&
+      meeting.isSharing
+    ) {
       const sharingUser = meeting.meetingUsers.find(
-        (user) => user.user_id === screenStream.uid
+        (user) => user.user_id === meeting.meetingInfo.screen_shared_uid
       );
+      const me = sharingUser?.user_id === currentUser.userId;
       const screenView = (
         <View
-          player={screenStream?.playerComp}
-          me={false}
-          stream={screenStream}
-          audioLevels={audioLevels}
-          speaking={false}
+          player={
+            <ShareView
+              rtc={props.rtc}
+              sharingUser={sharingUser}
+              me={me}
+              localCaptureSuccess={meeting.localCaptureSuccess}
+            />
+          }
+          me={me}
+          speaking={sharingUser?.is_mic_on}
           {...(sharingUser as MeetingUser)}
           is_sharing={true}
-          localVolume={localVolume}
+          sharingView={true}
+          volume={meeting.meetingInfo.localSpeaker?.volume ?? 0}
         />
       );
       updateScreenView(screenView);
     }
   }, [
+    meeting.isSharing,
+    meeting.localCaptureSuccess,
     meeting.meetingUsers,
     screenStream,
     currentUser,
-    audioLevels,
-    localVolume,
+    props.rtc,
+    meeting.meetingInfo.screen_shared_uid,
+    meeting.viewMode,
+    meeting.meetingInfo.localSpeaker.volume,
   ]);
 
-  const renderViews = () => {
-    if (meeting.viewMode === ViewMode.GalleryView) {
-      return (
-        <>
-          <GalleryView views={activeUsersViews} />
-          <HiddenVideo
-            users={meeting.orderMeetingUsers.slice(
-              9,
-              meeting.orderMeetingUsers.length
-            )}
-            remoteStreams={remoteStreams}
+  //本地流View
+  useEffect(() => {
+    const _user = meeting.meetingUsers.find(
+      (user) => user.user_id === currentUser.userId
+    );
+    const localView = (
+      <View
+        player={
+          <LocalPlayer
+            localCaptureSuccess={meeting.localCaptureSuccess}
+            rtc={props.rtc}
+            renderDom="local-player"
           />
-        </>
-      );
-    } else {
-      return (
-        <>
-          <SpeakerView
-            screenView={screenView}
-            views={activeUsersViews}
-            meeting={meeting}
-          />
-          <HiddenVideo
-            users={meeting.orderMeetingUsers.slice(
-              8,
-              meeting.orderMeetingUsers.length
-            )}
-            remoteStreams={remoteStreams}
-          />
-        </>
-      );
-    }
-  };
+        }
+        key={currentUser.userId}
+        me={true}
+        speaking={currentUser?.isMicOn || false}
+        sharingId={meeting.meetingInfo.screen_shared_uid}
+        volume={meeting.meetingInfo.localSpeaker?.volume ?? 0}
+        sharingView={false}
+        {...(_user as MeetingUser)}
+        {...{
+          is_camera_on: currentUser.isCameraOn,
+          is_mic_on: currentUser.isMicOn,
+        }}
+      />
+    );
+    updateLocalView(localView);
+  }, [
+    meeting.meetingInfo.localSpeaker.volume,
+    meeting.meetingUsers,
+    currentUser,
+    meeting.localCaptureSuccess,
+    meeting.meetingInfo.screen_shared_uid,
+    props.rtc,
+  ]);
 
-  return <div className={styles.container}>{renderViews()}</div>;
+
+  //宫格模式
+  if (meeting.viewMode === ViewMode.GalleryView) {
+    const galleryUser = activeUsersViews.slice(0, 8);
+    return (
+      <div className={styles.container}>
+        <GalleryView views={[localView, ...galleryUser]} />
+        <HiddenVideo
+          views={activeUsersViews.slice(8, activeUsersViews.length)}
+        />
+      </div>
+    );
+  }
+
+  //分享模式
+  return (
+    <div className={styles.container}>
+      <SpeakerView
+        screenView={screenView}
+        views={[localView, ...activeUsersViews.slice(0, 7)]}
+        meeting={meeting}
+      />
+      <HiddenVideo views={activeUsersViews.slice(7, activeUsersViews.length)} />
+    </div>
+  );
 };
 
-export default connector(injectIntl(MeetingViews));
+export default injectProps(MeetingViews);

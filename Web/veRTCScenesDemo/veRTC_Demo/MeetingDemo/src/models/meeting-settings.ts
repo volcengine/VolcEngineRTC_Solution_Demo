@@ -12,7 +12,7 @@ interface Range {
   max: number;
 }
 
-interface StreamSettings {
+export interface StreamSettings {
   resolution: Resolution;
   frameRate: Range;
   bitrate: Range;

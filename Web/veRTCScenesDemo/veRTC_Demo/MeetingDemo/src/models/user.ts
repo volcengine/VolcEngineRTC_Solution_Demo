@@ -7,6 +7,7 @@ import { TOASTS } from '@/config';
  */
 
 export interface UserModelState {
+  appId: string | null;
   name: string | null;
   roomId: string | null;
   isHost: boolean;
@@ -26,6 +27,7 @@ export interface UserModelState {
 }
 
 export const userInitialState: UserModelState = {
+  appId: null,
   name: null,
   roomId: null,
   isHost: false,
@@ -37,7 +39,7 @@ export const userInitialState: UserModelState = {
   userId: null,
   deviceAccess: {
     audio: true,
-    video: true
+    video: true,
   },
   network: true,
 };
@@ -45,6 +47,7 @@ export const userInitialState: UserModelState = {
 const factory = actionCreatorFactory('user');
 
 export const userActions = {
+  setAppId: factory<UserModelState['appId']>('setAppId'),
   setUserName: factory<UserModelState['name']>('setUserName'),
   setUserId: factory<UserModelState['name']>('setUserId'),
   setRoomId: factory<UserModelState['roomId']>('setRoomId'),
@@ -64,6 +67,7 @@ const UserModel: AppModel<UserModelState> = {
   state: userInitialState,
   subscriptions: {},
   reducers: {
+    setAppId: setFieldReducer(userInitialState, 'appId'),
     setUserName: setFieldReducer(userInitialState, 'name'),
     setUserId: setFieldReducer(userInitialState, 'userId'),
     setRoomId: setFieldReducer(userInitialState, 'roomId'),

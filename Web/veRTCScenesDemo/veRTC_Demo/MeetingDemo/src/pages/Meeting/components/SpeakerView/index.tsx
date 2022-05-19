@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styles from './index.less';
-// import { IRemoteAudioLevel } from '@/app-interfaces';
 import { MeetingModelState } from '@/models/meeting';
 
 interface ISpeakerViewProps {

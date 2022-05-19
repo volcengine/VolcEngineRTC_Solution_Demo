@@ -23,7 +23,7 @@ const IconBtn: React.FC<IconBtnProps> = props => {
         width: props.width || 24,
         height: props.height || 24,
         borderRadius: finalRadius
-    }}
+     }}
     >
       {props.children}
     </div>
