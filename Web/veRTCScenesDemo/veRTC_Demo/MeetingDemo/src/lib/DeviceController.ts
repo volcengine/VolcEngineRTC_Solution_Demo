@@ -1,14 +1,11 @@
 import { StreamIndex } from '@volcengine/rtc';
-import {
-  MeetingProps,
-} from '@/app-interfaces';
+import { MeetingProps } from '@/app-interfaces';
 import { TOASTS } from '@/constant';
 import { message } from 'antd';
 import { UserModelState } from '../models/user';
 import { MeetingSettingsState } from '../models/meeting-settings';
 import { ICreateStreamRes } from '../rtcApi/types';
 import { MeetingModelState } from '../models/meeting';
-
 
 /**
  * @brief 设备管理

@@ -7,7 +7,6 @@ import { ConnectedProps } from 'react-redux';
 import { injectIntl } from 'umi';
 import React from 'react';
 
-
 /**
  * @brief 获取 Redux 中信息
  * @function mapStateToProps
@@ -29,10 +28,10 @@ const mapStateToProps = (state: AppState) => {
  * @returns
  */
 const mapDispatchToProps = (dispatch: Dispatch) => {
-    return {
-        dispatch,
-        ...bindActionCreators({ ...userActions, ...meetingActions }, dispatch),
-    };
+  return {
+    dispatch,
+    ...bindActionCreators({ ...userActions, ...meetingActions }, dispatch),
+  };
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -46,10 +45,10 @@ const injectProps = (comp: React.FC<any> | React.ComponentType<any>) => {
 };
 
 export {
-    mapStateToProps,
-    mapDispatchToProps,
-    connect,
-    connector,
-    injectProps,
-    ConnectedProps,
+  mapStateToProps,
+  mapDispatchToProps,
+  connect,
+  connector,
+  injectProps,
+  ConnectedProps,
 };

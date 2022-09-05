@@ -7,7 +7,7 @@ import VERTC, {
   LocalStreamStats,
   RemoteStreamStats,
   StreamIndex,
-  RTCDevice
+  RTCDevice,
 } from '@volcengine/rtc';
 
 import { IVolume } from '@/app-interfaces';

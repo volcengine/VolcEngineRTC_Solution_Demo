@@ -1,5 +1,5 @@
 import { IVolume } from './../app-interfaces';
-import {actionCreatorFactory} from 'dva-model-creator';
+import { actionCreatorFactory } from 'dva-model-creator';
 import { AppModel } from '@/app-interfaces';
 import { setFieldReducer } from '@/utils/redux-utils';
 
@@ -120,7 +120,7 @@ const meetingInitialState: MeetingModelState = {
       volume: 0,
       userId: '',
     },
-    volumeSortList: []
+    volumeSortList: [],
     // hasTrackError: null,
   },
   meetingUsers: [],
@@ -144,9 +144,9 @@ export const meetingActions = {
   setLocalAudioVideoCaptureSuccess: factory<
     MeetingModelState['localAudioVideoCaptureSuccess']
   >('setLocalAudioVideoCaptureSuccess'),
-  setMeetingIsSharing: factory<
-    MeetingModelState['isSharing']
-  >('setMeetingIsSharing'),
+  setMeetingIsSharing: factory<MeetingModelState['isSharing']>(
+    'setMeetingIsSharing'
+  ),
 };
 
 const MeetingModel: AppModel<MeetingModelState> = {

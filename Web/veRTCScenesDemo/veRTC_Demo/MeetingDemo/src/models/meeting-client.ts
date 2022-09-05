@@ -13,15 +13,11 @@ export const rtcClientInitialState: RTCClientControlModelState = {
   rtc: new RtcClient(),
 };
 
-
-
 const LoginModel: AppModel<RTCClientControlModelState> = {
   namespace: 'rtcClientControl',
   state: rtcClientInitialState,
-  subscriptions: {
-  },
-  reducers: {
-  },
+  subscriptions: {},
+  reducers: {},
 };
 
 export default LoginModel;

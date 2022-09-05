@@ -67,25 +67,37 @@ export const meetingSettingsInitialState: MeetingSettingsState = {
 const factory = actionCreatorFactory('meetingSettings');
 
 export const meetingSettingsActions = {
-  setStreamSettings: factory<MeetingSettingsState['streamSettings']>('setStreamSettings'),
-  setScreenStreamSettings: factory<MeetingSettingsState['screenStreamSettings']>('setScreenStreamSettings'),
+  setStreamSettings:
+    factory<MeetingSettingsState['streamSettings']>('setStreamSettings'),
+  setScreenStreamSettings: factory<
+    MeetingSettingsState['screenStreamSettings']
+  >('setScreenStreamSettings'),
   setMic: factory<MeetingSettingsState['mic']>('setMic'),
   setCamera: factory<MeetingSettingsState['camera']>('setCamera'),
-  setRealtimeParam: factory<MeetingSettingsState['realtimeParam']>('setRealtimeParam'),
+  setRealtimeParam:
+    factory<MeetingSettingsState['realtimeParam']>('setRealtimeParam'),
 };
-
 
 const MeetingSettingsModel: AppModel<MeetingSettingsState> = {
   namespace: 'meetingSettings',
   state: meetingSettingsInitialState,
   subscriptions: {},
   reducers: {
-    setStreamSettings: setFieldReducer(meetingSettingsInitialState, 'streamSettings'),
-    setScreenStreamSettings: setFieldReducer(meetingSettingsInitialState, 'screenStreamSettings'),
+    setStreamSettings: setFieldReducer(
+      meetingSettingsInitialState,
+      'streamSettings'
+    ),
+    setScreenStreamSettings: setFieldReducer(
+      meetingSettingsInitialState,
+      'screenStreamSettings'
+    ),
     setMic: setFieldReducer(meetingSettingsInitialState, 'mic'),
     setCamera: setFieldReducer(meetingSettingsInitialState, 'camera'),
-    setRealtimeParam: setFieldReducer(meetingSettingsInitialState, 'realtimeParam'),
-  }
+    setRealtimeParam: setFieldReducer(
+      meetingSettingsInitialState,
+      'realtimeParam'
+    ),
+  },
 };
 
 export default MeetingSettingsModel;

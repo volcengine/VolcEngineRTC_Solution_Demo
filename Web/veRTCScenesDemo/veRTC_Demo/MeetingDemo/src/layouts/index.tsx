@@ -6,12 +6,14 @@ import VERTC from '@volcengine/rtc';
 
 const { Header, Content } = Layout;
 
-const BasicLayout: React.FC = props => {
+const BasicLayout: React.FC = (props) => {
   return (
     <Layout className={styles.layout}>
       <Header className={styles.title}>
         <Logo />
-        <span className={styles.version}>Demo版本 V1.0.1 / SDK版本 v{VERTC.getSdkVersion()}</span>
+        <span className={styles.version}>
+          Demo版本 V1.0.1 / SDK版本 v{VERTC.getSdkVersion()}
+        </span>
       </Header>
       <Content className={styles.content}>{props.children}</Content>
     </Layout>

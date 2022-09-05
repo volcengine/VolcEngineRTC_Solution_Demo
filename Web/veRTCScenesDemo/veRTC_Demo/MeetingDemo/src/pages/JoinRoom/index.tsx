@@ -20,7 +20,11 @@ import Utils from '@/utils/utils';
 import { StoreValue } from 'rc-field-form/lib/interface';
 import { modalWarning } from '@/pages/Meeting/components/MessageTips';
 import { LocalPlayer } from '../Meeting/components/MediaPlayer';
-import { injectProps, ConnectedProps, connector } from '../Meeting/configs/config';
+import {
+  injectProps,
+  ConnectedProps,
+  connector,
+} from '../Meeting/configs/config';
 import DeviceController from '@/lib/DeviceController';
 
 const logger = new Logger('JoinRoom');
@@ -70,30 +74,31 @@ export class Login extends Component<LoginProps, LoginState> {
   }
 
   componentDidMount(): void {
-    const {
-      currentUser,
-      settings
-    } = this.props;
+    const { currentUser, settings } = this.props;
 
     const param = {
       currentUser,
       settings,
     };
     this.props.rtc.createEngine();
-    this.deviceLib.openCamera(param, () => {
-      this.props.setLocalAudioVideoCaptureSuccess(true);
-      this.setState({
-        cameraStream: {
-          playerComp: (
-            <LocalPlayer
-              localCaptureSuccess={true}
-              rtc={this.props.rtc}
-              renderDom="local-preview-player"
-            />
-          ),
-        },
-      });
-    }, false);
+    this.deviceLib.openCamera(
+      param,
+      () => {
+        this.props.setLocalAudioVideoCaptureSuccess(true);
+        this.setState({
+          cameraStream: {
+            playerComp: (
+              <LocalPlayer
+                localCaptureSuccess={true}
+                rtc={this.props.rtc}
+                renderDom="local-preview-player"
+              />
+            ),
+          },
+        });
+      },
+      false
+    );
   }
 
   /**

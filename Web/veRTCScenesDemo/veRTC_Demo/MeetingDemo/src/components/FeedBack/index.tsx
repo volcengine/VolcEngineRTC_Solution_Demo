@@ -25,7 +25,9 @@ const ToggleButton = () => {
         <span
           key={item}
           onClick={() => clickDom(item)}
-          className={selected.indexOf(item) == -1 ? '' : styles['span-selected']}
+          className={
+            selected.indexOf(item) === -1 ? '' : styles['span-selected']
+          }
         >
           {item}
         </span>
@@ -35,7 +37,7 @@ const ToggleButton = () => {
 };
 
 const FeedBack: FC<{ status: string }> = ({ status }) => {
-  const [ visible, setVisible ] = useState(status === 'end');
+  const [visible, setVisible] = useState(status === 'end');
   const [detailVisible, setDetailVisible] = useState(false);
 
   const openDetail = () => {

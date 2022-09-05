@@ -3,14 +3,11 @@ import { MeetingModelState } from './models/meeting';
 import { MeetingSettingsState } from './models/meeting-settings';
 import { RTCClientControlModelState } from './models/meeting-client';
 
-import { MeetingControlModelState } from '@@/plugin-dva/connect';
-import {ImmerReducer} from '@@/plugin-dva/connect';
-import {Action} from 'dva-model-creator';
-import {EffectsMapObject, SubscriptionsMapObject} from 'dva';
+import { MeetingControlModelState, ImmerReducer } from '@@/plugin-dva/connect';
+import { Action } from 'dva-model-creator';
+import { EffectsMapObject, SubscriptionsMapObject } from 'dva';
 import { AudioStats } from '@/lib/socket-interfaces';
-import {
-  RTCStream,
-} from '@volcengine/rtc';
+import { RTCStream } from '@volcengine/rtc';
 import { ConnectedProps, connector } from '@/pages/Meeting/configs/config';
 
 export interface AppState {
@@ -25,14 +22,15 @@ export interface AppModel<S> {
   namespace: string;
   state: S;
   reducers: {
-    [K in string]: ImmerReducer<S, Action<any>>
-  },
-  effects?: EffectsMapObject,
-  subscriptions?: SubscriptionsMapObject,
+    [K in string]: ImmerReducer<S, Action<any>>;
+  };
+  effects?: EffectsMapObject;
+  subscriptions?: SubscriptionsMapObject;
 }
 
 export enum FitType {
-  cover, contain
+  cover,
+  contain,
 }
 
 type EncoderConfiguration = {
@@ -113,8 +111,8 @@ export interface RTCClint {
   ) => void;
   leave: (onSuccess?: () => void, onFailure?: (err: Error) => void) => void;
   on: (event: string, callback: (param: any) => void) => void;
-  getRemoteAudioStats(callback: (param: AudioStats) => void): void;
-  getLocalAudioStats(callback: (param: AudioStats) => void): void;
+  getRemoteAudioStats: (callback: (param: AudioStats) => void) => void;
+  getLocalAudioStats: (callback: (param: AudioStats) => void) => void;
 }
 
 export interface ConnectStatus {
@@ -166,9 +164,7 @@ export interface IMeetingState {
   users: any[];
 }
 
-
-export type MeetingProps = ConnectedProps<typeof connector>
-
+export type MeetingProps = ConnectedProps<typeof connector>;
 
 export type LocalStats = {
   audioStats: {

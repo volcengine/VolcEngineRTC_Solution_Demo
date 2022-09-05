@@ -5,47 +5,43 @@ import { TOASTS } from '@/config';
 import type {
   UserStatusChangePayload,
   HostChangePayload,
+  JoinMeetingResponse,
 } from '@/lib/socket-interfaces';
-import { ViewMode } from '@/models/meeting';
-import { showOpenMicConfirm, sendMutedInfo } from '@/pages/Meeting/components/MessageTips';
+import { ViewMode, MeetingUser } from '@/models/meeting';
+import {
+  showOpenMicConfirm,
+  sendMutedInfo,
+} from '@/pages/Meeting/components/MessageTips';
 import React from 'react';
 import DeviceController from '@/lib/DeviceController';
 import { injectProps } from '@/pages/Meeting/configs/config';
-import { MeetingProps } from '@/app-interfaces';
 import Utils from '@/utils/utils';
 import { history } from 'umi';
 import VideoAudioSubscribe from '@/lib/VideoAudioSubscribe';
-import {
-  IMeetingState,
-  IVolume,
-} from '@/app-interfaces';
+import { IMeetingState, IVolume, MeetingProps } from '@/app-interfaces';
 import {
   RTCStream,
   RemoteStreamStats,
   LocalStreamStats,
 } from '@volcengine/rtc';
-import type { MeetingUser } from '@/models/meeting';
-import type { JoinMeetingResponse } from '@/lib/socket-interfaces';
-import {
-  MediaPlayer,
-} from '../MediaPlayer';
+import { MediaPlayer } from '../MediaPlayer';
 import MeetingViews from '../MeetingViews';
 import StreamStats from '../StreamStats';
 
 const logger = new Logger('meeting-event');
 
 interface IEvent {
-  end(): void;
+  end: () => void;
   leavingMeeting: () => void;
 }
 
 type IProps = MeetingProps & IEvent;
 
 /**
-  * @param drawerVisible 用户列表抽屉是否可见
-  * @param exitVisible 退出会议弹窗是否可见
-  * @param volumeSortList 音量根据大到小排序的对象数组
-  */
+ * @param drawerVisible 用户列表抽屉是否可见
+ * @param exitVisible 退出会议弹窗是否可见
+ * @param volumeSortList 音量根据大到小排序的对象数组
+ */
 const initState = {
   usersDrawerVisible: false,
   cameraStream: null,
@@ -63,10 +59,9 @@ const initState = {
   streamStatses: {
     local: {},
     localScreen: undefined,
-    remoteStreams: {
-    }
+    remoteStreams: {},
   },
-  users: []
+  users: [],
 };
 
 class MeetingEvent extends React.Component<IProps, IMeetingState> {
@@ -130,7 +125,7 @@ class MeetingEvent extends React.Component<IProps, IMeetingState> {
     });
 
     history.listen((location, action) => {
-      if (action == 'POP') {
+      if (action === 'POP') {
         if (location.pathname === '/meeting') {
           this.setState({
             refresh: true,
