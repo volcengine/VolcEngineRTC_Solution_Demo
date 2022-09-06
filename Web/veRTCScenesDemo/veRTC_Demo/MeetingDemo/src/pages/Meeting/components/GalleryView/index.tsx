@@ -8,19 +8,18 @@ interface IGalleryViewProps {
   views: React.ReactNode[];
 }
 
-
 const getRowCount = (total: number) => {
   if (total >= 7) {
     return 3;
   }
-  if (total >=3) {
+  if (total >= 3) {
     return 2;
   }
   return 1;
 };
 
 const getColCount = (total: number) => {
-  if ( total >=5 ) {
+  if (total >= 5) {
     return 3;
   }
   if (total >= 2) {
@@ -35,14 +34,16 @@ const GalleryView: React.FC<IGalleryViewProps> = ({ views }) => {
     cols: getColCount(views.length) || 1,
   });
 
-  const updateView = useCallback( // eslint-disable-line react-hooks/exhaustive-deps
-    debounce((len)=> {
+  const updateView = useCallback(
+    // eslint-disable-line react-hooks/exhaustive-deps
+    debounce((len) => {
       updateLayout({
         rows: getRowCount(len),
         cols: getColCount(len),
       });
-    },500),
-  []);
+    }, 500),
+    []
+  );
 
   useEffect(() => {
     const len = views.length;
@@ -69,7 +70,7 @@ const GalleryView: React.FC<IGalleryViewProps> = ({ views }) => {
                 className={styles.galleryView}
                 key={(view as React.ReactElement)?.key}
                 style={{
-                  padding: groups.length ===1?'0px':'12px',
+                  padding: groups.length === 1 ? '0px' : '12px',
                   width: `${100 / layout.cols}%`,
                 }}
               >
@@ -85,12 +86,7 @@ const GalleryView: React.FC<IGalleryViewProps> = ({ views }) => {
     return [];
   };
 
-  return (
-    <div className={styles.container}>
-      {renderViews()}
-    </div>
-  );
+  return <div className={styles.container}>{renderViews()}</div>;
 };
 
 export default GalleryView;
-

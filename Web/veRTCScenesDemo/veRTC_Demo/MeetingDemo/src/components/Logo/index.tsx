@@ -5,12 +5,7 @@ import styles from './index.less';
 const Logo: React.FC = () => {
   return (
     <div className={styles.container}>
-      <img
-        src={logoImg}
-        alt="logo"
-        draggable="false"
-        width={242}
-      />
+      <img src={logoImg} alt="logo" draggable="false" width={242} />
     </div>
   );
 };

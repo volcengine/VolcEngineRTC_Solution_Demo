@@ -1,4 +1,4 @@
-@import "~@/utils/utils.less";
+@import '~@/utils/utils.less';
 
 .container {
   .flex-box();
@@ -7,7 +7,7 @@
   min-width: 800px;
   min-height: 600px;
   justify-content: center;
-  background-color: #272E3B;
+  background-color: #272e3b;
   &::before {
     content: '';
     padding-top: 100%;
@@ -18,18 +18,18 @@
     display: block;
     clear: both;
   }
-  .main{
+  .main {
     text-align: left;
     display: flex;
     flex-direction: column;
     align-items: center;
-    .main-title{
+    .main-title {
       text-align: center;
       margin-bottom: 60px;
     }
-    .login-input{
+    .login-input {
       border-radius: 8px;
-      color: #FFF;
+      color: #fff;
       height: 48px;
       &:hover {
         border-color: #40a9ff;
@@ -38,80 +38,82 @@
       &-focused {
         border-color: #40a9ff !important;
         box-shadow: 0 0 0 2px #1890ff33 !important;
-        background: #1C222D;
+        background: #1c222d;
       }
     }
     .login-input::placeholder {
-      .place-holder()
+      .place-holder();
     }
-    .login-check{
+    .login-check {
       border-radius: 24px;
       width: 320px;
       height: 48px;
-      color: #FFF;
+      color: #fff;
     }
-    .login-agree{
-      :global{
-        .ant-checkbox-wrapper{
+    .login-agree {
+      :global {
+        .ant-checkbox-wrapper {
           color: #fff;
         }
       }
     }
     :global {
       .ant-form-item-explain,
-      .ant-form-item-extra{
+      .ant-form-item-extra {
         line-height: 24px;
       }
-      .ant-btn-primary[disabled]{
-        background-color: #4080FF;
+      .ant-btn-primary[disabled] {
+        background-color: #4080ff;
         opacity: 0.3;
-        border-color: #4080FF;
+        border-color: #4080ff;
       }
-      .ant-form-item{
+      .ant-form-item {
         margin-bottom: 32px;
       }
-      .ant-form-item-with-help{
+      .ant-form-item-with-help {
         margin-bottom: 8px;
       }
       .ant-form-item-has-error :not(.ant-input-disabled).ant-input,
-      .ant-form-item-has-error :not(.ant-input-affix-wrapper-disabled).ant-input-affix-wrapper,
+      .ant-form-item-has-error
+        :not(.ant-input-affix-wrapper-disabled).ant-input-affix-wrapper,
       .ant-form-item-has-error :not(.ant-input-disabled).ant-input:hover,
-      .ant-form-item-has-error :not(.ant-input-affix-wrapper-disabled).ant-input-affix-wrapper:hover{
-        background: #1C222D;
-        color: #FFF;
+      .ant-form-item-has-error
+        :not(.ant-input-affix-wrapper-disabled).ant-input-affix-wrapper:hover {
+        background: #1c222d;
+        color: #fff;
         border-color: #ff4d4f;
       }
-      .ant-input-affix-wrapper{
+      .ant-input-affix-wrapper {
         height: 48px;
         border-radius: 8px;
-        background: #1C222D;
-        color: #FFF;
+        background: #1c222d;
+        color: #fff;
         &:hover {
           border-color: #40a9ff;
         }
         input::placeholder {
-          .place-holder()
+          .place-holder();
         }
         button {
           background: rgba(255, 255, 255, 0.1);
-          color: #FFF;
+          color: #fff;
           border: none;
           border-radius: 4px;
         }
-        :global{
-          input{
-            color: #FFF;
+        :global {
+          input {
+            color: #fff;
             &:focus,
             &-focused {
-              background: #1C222D;
+              background: #1c222d;
             }
           }
         }
       }
       .ant-input {
-        background: #1C222D;
+        background: #1c222d;
         input::placeholder {
-          .place-holder()
+          .place-holder();
         }
       }
       .ant-checkbox input,

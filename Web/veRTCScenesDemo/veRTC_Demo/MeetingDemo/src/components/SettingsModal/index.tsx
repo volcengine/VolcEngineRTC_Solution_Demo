@@ -1,6 +1,14 @@
 import React, { FC, useState, useEffect, useMemo, useCallback } from 'react';
-import { StreamIndex } from '@volcengine/rtc';
-import { Modal, Form, Select, Switch, Slider, Row, Col, notification } from 'antd';
+import {
+  Modal,
+  Form,
+  Select,
+  Switch,
+  Slider,
+  Row,
+  Col,
+  notification,
+} from 'antd';
 import { connect, bindActionCreators } from 'dva';
 import { injectIntl } from 'umi';
 import { ConnectedProps } from 'react-redux';
@@ -15,7 +23,7 @@ import deleteIcon from '/assets/images/deleteIcon.png';
 import moment from 'moment';
 import Logger from '@/utils/Logger';
 import Utils from '@/utils/utils';
-import VERTC, {RTCDevice} from '@volcengine/rtc';
+import VERTC, { RTCDevice, StreamIndex } from '@volcengine/rtc';
 
 const logger = new Logger('Settings');
 
@@ -24,20 +32,21 @@ function mapStateToProps(state: AppState) {
     user: state.user,
     mc: state.meetingControl.sdk,
     settings: state.meetingSettings,
-    rtc: state.rtcClientControl.rtc
+    rtc: state.rtcClientControl.rtc,
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     dispatch,
-    ...bindActionCreators(meetingSettingsActions, dispatch)
+    ...bindActionCreators(meetingSettingsActions, dispatch),
   };
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-export type SettingsModalProps = ConnectedProps<typeof connector> & WrappedComponentProps & { visible: boolean, close: () => void, };
+export type SettingsModalProps = ConnectedProps<typeof connector> &
+  WrappedComponentProps & { visible: boolean; close: () => void };
 
 const commonCol = {
   labelCol: { span: 8 },
@@ -96,7 +105,12 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
     });
   }, [form, initialValues]);
 
-  const formatStreamSettings = (res: string, fps: number, bps: number, bpsMin: number) => {
+  const formatStreamSettings = (
+    res: string,
+    fps: number,
+    bps: number,
+    bpsMin: number
+  ) => {
     return {
       resolution: {
         width: parseInt(res.split(' * ')[0]),
@@ -112,15 +126,33 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
 
   const onOk = async () => {
     const data = form.getFieldsValue(true);
-    const streamConfigs = formatStreamSettings(data.resolution, data.FPS, data.BPS, 250);
-    const screenConfigs = formatStreamSettings(data.shareResolution, data.shareFPS, data.shareBPS, 800);
+    const streamConfigs = formatStreamSettings(
+      data.resolution,
+      data.FPS,
+      data.BPS,
+      250
+    );
+    const screenConfigs = formatStreamSettings(
+      data.shareResolution,
+      data.shareFPS,
+      data.shareBPS,
+      800
+    );
 
     const isolation = ['width', 'height', 'max', 'min'];
-    const streamDiff = Utils.diff(settings.streamSettings, streamConfigs, isolation);
-    const screenDiff = Utils.diff(settings.screenStreamSettings, screenConfigs, isolation);
+    const streamDiff = Utils.diff(
+      settings.streamSettings,
+      streamConfigs,
+      isolation
+    );
+    const screenDiff = Utils.diff(
+      settings.screenStreamSettings,
+      screenConfigs,
+      isolation
+    );
 
     const caseToDo = (key: string, type: string) => {
-      switch(key) {
+      switch (key) {
         case 'frameRate':
         case 'resolution':
           engine.setVideoCaptureConfig({
@@ -129,16 +161,18 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
           });
           break;
         case 'bitrate':
-          if (type === 'stream') engine.setVideoEncoderConfig(StreamIndex.STREAM_INDEX_MAIN, [
-            {
-              maxKbps: streamConfigs.bitrate.max,
-            },
-          ]);
-          else engine.setVideoEncoderConfig(StreamIndex.STREAM_INDEX_SCREEN, [
-            {
-              maxKbps: screenConfigs.bitrate.max,
-            },
-          ]);
+          if (type === 'stream')
+            engine.setVideoEncoderConfig(StreamIndex.STREAM_INDEX_MAIN, [
+              {
+                maxKbps: streamConfigs.bitrate.max,
+              },
+            ]);
+          else
+            engine.setVideoEncoderConfig(StreamIndex.STREAM_INDEX_SCREEN, [
+              {
+                maxKbps: screenConfigs.bitrate.max,
+              },
+            ]);
           break;
         default:
           break;
@@ -146,17 +180,17 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
     };
 
     //TODO 如果有变化, 则做对应的处理
-    for(const diffKey in streamDiff) {
+    for (const diffKey in streamDiff) {
       caseToDo(diffKey, 'stream');
     }
-    for(const diffKey in screenDiff) {
+    for (const diffKey in screenDiff) {
       caseToDo(diffKey, 'screen');
     }
 
     if (settings.mic && settings.mic !== data.mic) {
       await engine?.switchMicrophone(data.mic);
     }
-    if (settings.camera  && settings.camera !== data.camera) {
+    if (settings.camera && settings.camera !== data.camera) {
       await engine.switchCamera(data.camera);
       engine.setLocalVideoMirrorType(1);
     }
@@ -177,30 +211,32 @@ const SettingsModal: FC<SettingsModalProps> = (props) => {
         setLoading(false);
       });
     });
-  },[mc]);
+  }, [mc]);
 
-  const devicesEmu = useCallback(async() =>{
+  const devicesEmu = useCallback(async () => {
     const devices = await props.rtc.getDevices();
     setDevices(devices);
-  },[props.rtc]);
+  }, [props.rtc]);
 
   useEffect(() => {
     devicesEmu();
     getHistoryVideoRecord();
-    props.rtc.engine.on(VERTC.events.onMediaDeviceStateChanged, (e: RTCDevice) => {
-
-      if(e.deviceType === 'audioinput'){
-        setMic(e.deviceState === 'inactive' ? '' : e.deviceId);
+    props.rtc.engine.on(
+      VERTC.events.onMediaDeviceStateChanged,
+      (e: RTCDevice) => {
+        if (e.deviceType === 'audioinput') {
+          setMic(e.deviceState === 'inactive' ? '' : e.deviceId);
+        }
+        if (e.deviceType === 'videoinput') {
+          setCamera(e.deviceState === 'inactive' ? '' : e.deviceId);
+        }
+        devicesEmu();
       }
-      if(e.deviceType === 'videoinput'){
-        setCamera(e.deviceState === 'inactive' ? '' :  e.deviceId);
-      }
-      devicesEmu();
-    });
+    );
   }, []);
 
   const myVideoList = useMemo(() => {
-    return videoList?.filter(item => item.video_holder);
+    return videoList?.filter((item) => item.video_holder);
   }, [videoList]);
 
   return (

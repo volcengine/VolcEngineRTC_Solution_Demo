@@ -3,7 +3,7 @@ import { Tooltip } from 'antd';
 import { v4 as uuid } from 'uuid';
 import { useSize } from '@umijs/hooks';
 import Logger from '@/utils/Logger';
-import type { ActiveMeetingUser } from '../../pages/Meeting/components/MeetingViews';
+import type { ActiveMeetingUser } from '@/pages/Meeting/components/MeetingViews';
 import shareOffIcon from '/assets/images/shareOffIcon.png';
 import styles from './index.less';
 

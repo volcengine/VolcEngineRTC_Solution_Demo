@@ -15,7 +15,11 @@ import recordOffIcon from '/assets/images/recordOffIcon.png';
 import usersIcon from '/assets/images/usersIcon.png';
 import settingIcon from '/assets/images/settingIcon.png';
 import endIcon from '/assets/images/endIcon.png';
-import { connector, injectProps, ConnectedProps } from '../../configs/config';
+import {
+  connector,
+  injectProps,
+  ConnectedProps,
+} from '@/pages/Meeting/configs/config';
 import DeviceController from '@/lib/DeviceController';
 
 interface IControlBarProps {
@@ -23,10 +27,10 @@ interface IControlBarProps {
   leaveMeeting: () => void;
 }
 
-export type ControlBarProps = ConnectedProps<typeof connector> & IControlBarProps
+export type ControlBarProps = ConnectedProps<typeof connector> &
+  IControlBarProps;
 
 const ControlBar: React.FC<ControlBarProps> = (props) => {
-
   const { currentUser, meeting, openUsersDrawer, leaveMeeting } = props;
 
   const deviceController = useRef<DeviceController>(
@@ -36,13 +40,13 @@ const ControlBar: React.FC<ControlBarProps> = (props) => {
   const commonProps = {
     width: 36,
     height: 36,
-    style: { background: 'transparent', margin: 0 }
+    style: { background: 'transparent', margin: 0 },
   };
 
   /**
    * @param visible 设置窗口是否可见
    */
-  const [ visible, setVisible ] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   /**
    * @brief 麦克风切换状态
@@ -52,8 +56,7 @@ const ControlBar: React.FC<ControlBarProps> = (props) => {
     if (deviceController.current) {
       deviceController.current.changeAudioState(micState);
     }
-  },[]);
-
+  }, []);
 
   /**
    * @brief 摄像头切换状态
@@ -143,7 +146,13 @@ const ControlBar: React.FC<ControlBarProps> = (props) => {
           onClick={() => changeShareState(!currentUser.isSharing)}
         >
           <Tooltip title="屏幕共享">
-            <img src={!meeting.meetingInfo.screen_shared_uid ? shareOnIcon : shareOffIcon} />
+            <img
+              src={
+                !meeting.meetingInfo.screen_shared_uid
+                  ? shareOnIcon
+                  : shareOffIcon
+              }
+            />
           </Tooltip>
         </IconBtn>
       </div>

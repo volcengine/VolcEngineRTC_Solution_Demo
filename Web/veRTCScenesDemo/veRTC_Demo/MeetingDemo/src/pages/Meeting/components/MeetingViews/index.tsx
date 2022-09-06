@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { UserModelState } from '@/models/user';
-import { MeetingUser } from '@/models/meeting';
-import { ViewMode } from '@/models/meeting';
+import { MeetingUser, ViewMode } from '@/models/meeting';
 import { Stream } from '@/app-interfaces';
 import View from '@/components/View';
 import Logger from '@/utils/Logger';
 import { WrappedComponentProps } from 'react-intl';
-import { injectProps, ConnectedProps, connector } from '../../configs/config';
-import { LocalPlayer, ShareView } from '../../components/MediaPlayer';
+import {
+  injectProps,
+  ConnectedProps,
+  connector,
+} from '@/pages/Meeting/configs/config';
+import { LocalPlayer, ShareView } from '@/pages/Meeting/components/MediaPlayer';
 
 import GalleryView from '../GalleryView';
 import SpeakerView from '../SpeakerView';
@@ -42,16 +45,12 @@ export type MeetingViewsProps = ConnectedProps<typeof connector> &
   WrappedComponentProps &
   IMeetingViewsProps;
 
-
 const MeetingViews: React.FC<MeetingViewsProps> = (props) => {
-  const {
-    meeting,
-    currentUser,
-    cameraStream,
-    screenStream,
-    remoteStreams,
-  } = props;
-  const [activeUsersViews, updateActiveUsersViews] = useState<React.ReactNode[]>([]);
+  const { meeting, currentUser, cameraStream, screenStream, remoteStreams } =
+    props;
+  const [activeUsersViews, updateActiveUsersViews] = useState<
+    React.ReactNode[]
+  >([]);
   const [screenView, updateScreenView] = useState<React.ReactNode>(null);
   const [localView, updateLocalView] = useState<React.ReactNode>(null);
 
@@ -59,28 +58,27 @@ const MeetingViews: React.FC<MeetingViewsProps> = (props) => {
     const volumeSortList = meeting.meetingInfo.volumeSortList;
     if (volumeSortList?.length) {
       //按声音大小来排序
-      const activeUsersViews = volumeSortList
-        .map(({ userId, volume }) => {
-          const localProps: any = {};
-          const activeUser = meeting.meetingUsers.find(
-            (i) => i.user_id === `${userId}`
-          );
-          return activeUser ? (
-            <View
-              player={remoteStreams[userId]?.playerComp}
-              key={userId}
-              me={false}
-              speaking={activeUser?.is_mic_on || false}
-              volume={volume ?? 0}
-              {...activeUser}
-              {...localProps}
-              is_sharing={false}
-              sharingId={meeting.meetingInfo.screen_shared_uid}
-              count={volumeSortList?.length}
-              sharingView={false}
-            />
-          ) : null;
-        });
+      const activeUsersViews = volumeSortList.map(({ userId, volume }) => {
+        const localProps: any = {};
+        const activeUser = meeting.meetingUsers.find(
+          (i) => i.user_id === `${userId}`
+        );
+        return activeUser ? (
+          <View
+            player={remoteStreams[userId]?.playerComp}
+            key={userId}
+            me={false}
+            speaking={activeUser?.is_mic_on || false}
+            volume={volume ?? 0}
+            {...activeUser}
+            {...localProps}
+            is_sharing={false}
+            sharingId={meeting.meetingInfo.screen_shared_uid}
+            count={volumeSortList?.length}
+            sharingView={false}
+          />
+        ) : null;
+      });
       updateActiveUsersViews(activeUsersViews.filter((i) => i));
     }
   }, [
@@ -90,7 +88,7 @@ const MeetingViews: React.FC<MeetingViewsProps> = (props) => {
     currentUser,
     remoteStreams,
     meeting.meetingInfo.screen_shared_uid,
-    meeting.meetingInfo
+    meeting.meetingInfo,
   ]);
 
   //分享流View
@@ -172,7 +170,6 @@ const MeetingViews: React.FC<MeetingViewsProps> = (props) => {
     meeting.meetingInfo.screen_shared_uid,
     props.rtc,
   ]);
-
 
   //宫格模式
   if (meeting.viewMode === ViewMode.GalleryView) {

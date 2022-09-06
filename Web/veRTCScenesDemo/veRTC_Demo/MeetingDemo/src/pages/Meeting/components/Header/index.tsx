@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Logo from '@/components/Logo';
-import { MeetingModelState } from '@/models/meeting';
-import { ViewMode } from '@/models/meeting';
+import { MeetingModelState, ViewMode } from '@/models/meeting';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import Utils from '@/utils/utils';
 import { Badge } from 'antd';
@@ -24,7 +23,7 @@ const Header: React.FC<IHeaderProps> = ({
   now,
   roomId,
   meeting,
-  changeSpeakCollapse
+  changeSpeakCollapse,
 }) => {
   const [duration, updateDuration] = useState(0);
 
@@ -72,7 +71,12 @@ const Header: React.FC<IHeaderProps> = ({
           ) : null}
         </>
         <>
-          { meeting.meetingInfo.record ? <span style={{ marginLeft: 100 }}><Badge color='red' />REC</span> : null}
+          {meeting.meetingInfo.record ? (
+            <span style={{ marginLeft: 100 }}>
+              <Badge color="red" />
+              REC
+            </span>
+          ) : null}
         </>
       </div>
 

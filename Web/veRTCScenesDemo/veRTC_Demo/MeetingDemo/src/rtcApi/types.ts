@@ -5,4 +5,4 @@ export type ICreateStreamRes = {
     video: number;
     audio: number;
   };
-}
+};

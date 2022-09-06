@@ -1,10 +1,10 @@
-import React, {Component, ReactNode} from 'react';
+import React, { Component, ReactNode } from 'react';
 import { Dispatch } from '@@/plugin-dva/connect';
 import { injectIntl, history } from 'umi';
 import { connect, bindActionCreators } from 'dva';
 import { ConnectedProps } from 'react-redux';
 import { WrappedComponentProps } from 'react-intl';
-import {userActions} from '@/models/user';
+import { userActions } from '@/models/user';
 import { AppState } from '@/app-interfaces';
 import styles from './index.less';
 import { Button, Form, Input, Checkbox, message } from 'antd';
@@ -43,7 +43,7 @@ function mapStateToProps(state: AppState) {
   return {
     currentUser: state.user,
     mc: state.meetingControl.sdk,
-    rtc: state.rtcClientControl.rtc
+    rtc: state.rtcClientControl.rtc,
   };
 }
 
@@ -70,7 +70,7 @@ export class Login extends Component<LoginProps, LoginState> {
     super(props);
     this.state = {
       time: 60,
-      loading: false
+      loading: false,
     };
   }
 
@@ -130,7 +130,7 @@ export class Login extends Component<LoginProps, LoginState> {
               history.push('/');
             });
           })
-          .catch( (error) =>{
+          .catch((error) => {
             message.error(`${error}`);
           });
       });
@@ -140,21 +140,21 @@ export class Login extends Component<LoginProps, LoginState> {
     }
   };
 
-  count(): void{
+  count(): void {
     let { time } = this.state;
     const siv = setInterval(() => {
-      this.setState({ time: (time--) }, () => {
-      if (time <= -1) {
-        clearInterval(siv);
-        this.setState({ loading: false, time: 60 });
-      }
-    });
+      this.setState({ time: time-- }, () => {
+        if (time <= -1) {
+          clearInterval(siv);
+          this.setState({ loading: false, time: 60 });
+        }
+      });
     }, 1000);
   }
 
   validator(
     value: StoreValue,
-    errorTypeKey: 'phoneErrType' |  'codeErrType',
+    errorTypeKey: 'phoneErrType' | 'codeErrType',
     regRes: boolean
   ): Promise<void | any> | void {
     let result: Promise<Error | void>;
@@ -182,13 +182,15 @@ export class Login extends Component<LoginProps, LoginState> {
             <Form.Item
               name="cell_phone"
               validateTrigger="onChange"
-              rules={[{
-                required: true,
-                validator: (_, value) => {
-                  const res = !/^[1][3,4,5,7,8,9][0-9]{9}$/.test(value);
-                  return this.validator(value, 'phoneErrType', res);
+              rules={[
+                {
+                  required: true,
+                  validator: (_, value) => {
+                    const res = !/^[1][3,4,5,7,8,9][0-9]{9}$/.test(value);
+                    return this.validator(value, 'phoneErrType', res);
+                  },
                 },
-              }]}
+              ]}
             >
               <Input
                 autoComplete="off"

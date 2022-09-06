@@ -1,7 +1,4 @@
-import React, {
-  FC,
-  useMemo
-} from 'react';
+import React, { FC, useMemo } from 'react';
 import { Dispatch } from '@@/plugin-dva/connect';
 import { injectIntl } from 'umi';
 import { connect, bindActionCreators } from 'dva';
@@ -49,21 +46,14 @@ function mapDispatchToProps(dispatch: Dispatch) {
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type IProps = {
-  streamStatses: IMeetingState['streamStatses']
+  streamStatses: IMeetingState['streamStatses'];
 };
-
-
-
 
 export type StatsProps = ConnectedProps<typeof connector> &
   WrappedComponentProps &
   IProps;
 
-const StreamStats: FC<StatsProps> = ({
-  settings,
-  streamStatses,
-}) => {
-
+const StreamStats: FC<StatsProps> = ({ settings, streamStatses }) => {
   const local = useMemo(
     () => streamStatses.local,
     [streamStatses.local]
