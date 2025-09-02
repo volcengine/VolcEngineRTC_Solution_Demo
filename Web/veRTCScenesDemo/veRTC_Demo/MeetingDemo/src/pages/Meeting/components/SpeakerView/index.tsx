@@ -11,7 +11,7 @@ interface ISpeakerViewProps {
 const SpeakerView: React.FC<ISpeakerViewProps> = ({
   views,
   screenView,
-  meeting
+  meeting,
 }) => {
   return (
     <div className={styles.container}>

@@ -32,8 +32,10 @@ export const sendInfo = (): void => {
   message.info('你已发送请求');
 };
 
-
-export const hostChangeInfo = (user_name: string, callback: () => void): void => {
+export const hostChangeInfo = (
+  user_name: string,
+  callback: () => void
+): void => {
   Modal.info({
     title: `是否将主持人移交给: ${user_name}`,
     okText: '确定',

@@ -46,12 +46,4 @@ export default defineConfig({
   chainWebpack: function (memo) {
     memo.resolve.extensions.add('.tsx');
   },
-  define: {
-    'process.env': {
-      ENV: 'PROD',
-      SOCKETURL: 'wss://rtcio.bytedance.com',
-      ICEURL:
-        'https://rtc-access.bytedance.com/dispatch/v1/AccessInfo?Action=GetAccessInfo',
-    },
-  }
 });

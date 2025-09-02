@@ -1,8 +1,4 @@
-import React, {
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
+import React, { useMemo, useCallback, useRef } from 'react';
 import { Drawer, Tooltip, Button, message } from 'antd';
 import IconBtn from '@/components/IconBtn';
 import { MeetingUser } from '@/models/meeting';
@@ -13,7 +9,11 @@ import camOnIcon from '/assets/images/camOnIcon.png';
 import camOffIcon from '/assets/images/camOffIcon.png';
 import changeHostIcon from '/assets/images/changeHostIcon.png';
 import muteAllIcon from '/assets/images/muteAllIcon.png';
-import { connector, injectProps, ConnectedProps } from '../../configs/config';
+import {
+  connector,
+  injectProps,
+  ConnectedProps,
+} from '@/pages/Meeting/configs/config';
 
 import styles from './index.less';
 import { TOASTS } from '@/constant';
@@ -22,7 +22,7 @@ import DeviceController from '@/lib/DeviceController';
 import {
   sendInfo,
   hostChangeInfo,
-} from '../../components/MessageTips';
+} from '@/pages/Meeting/components/MessageTips';
 
 interface IProps {
   visible: boolean;
@@ -34,14 +34,7 @@ const logger = new Logger('UsersDrawer');
 export type IUsersDrawerProps = ConnectedProps<typeof connector> & IProps;
 
 const UsersDrawer: React.FC<IUsersDrawerProps> = (props) => {
-
-  const {
-    currentUser,
-    mc,
-    meeting,
-    visible,
-    closeUserDrawer,
-  } = props;
+  const { currentUser, mc, meeting, visible, closeUserDrawer } = props;
 
   logger.debug('meeting.meetingUsers %o', meeting.meetingUsers);
 
@@ -70,61 +63,70 @@ const UsersDrawer: React.FC<IUsersDrawerProps> = (props) => {
     } catch (error) {
       message.error({ content: `${error}` });
     }
-  },[mc]);
+  }, [mc]);
 
   /**
    * @brief 更换主持人
    * @function changeHost
    */
-  const changeHost = useCallback((uid: string, name: string): void => {
-    hostChangeInfo(name, () =>
-      mc
-        ?.changeHost({
-          user_id: uid,
-        })
-        .catch(() => message.error(TOASTS['give_host_error']))
-    );
-  },[mc]);
+  const changeHost = useCallback(
+    (uid: string, name: string): void => {
+      hostChangeInfo(name, () =>
+        mc
+          ?.changeHost({
+            user_id: uid,
+          })
+          .catch(() => message.error(TOASTS['give_host_error']))
+      );
+    },
+    [mc]
+  );
 
   /**
    * @brief 请求某用户打开麦克风
    * @function askMicOn
    */
-  const askMicOn = useCallback((user_id: string): void => {
-    try {
-      mc?.askMicOn({
-        user_id,
-      });
-      sendInfo();
-    } catch (error) {
-      message.error({ content: `${error}` });
-    }
-  },[mc]);
+  const askMicOn = useCallback(
+    (user_id: string): void => {
+      try {
+        mc?.askMicOn({
+          user_id,
+        });
+        sendInfo();
+      } catch (error) {
+        message.error({ content: `${error}` });
+      }
+    },
+    [mc]
+  );
 
   /**
    * @brief 静音某用户
    * @function muteUser
    */
-  const muteClick = useCallback((user: MeetingUser): void => {
-    if (currentUser.userId === user.user_id) {
-      // 如果操作的是自己
-      if (deviceController.current) {
-        deviceController.current.changeAudioState(!user.is_mic_on);
-      }
-    } else {
-      if (currentUser.isHost) {
-        // 请求对应用户打开 mic
-        if (!user.is_mic_on) askMicOn(user.user_id);
-        else {
-          mc?.muteUser({
-            user_id: user.user_id,
-          });
+  const muteClick = useCallback(
+    (user: MeetingUser): void => {
+      if (currentUser.userId === user.user_id) {
+        // 如果操作的是自己
+        if (deviceController.current) {
+          deviceController.current.changeAudioState(!user.is_mic_on);
         }
       } else {
-        message.warn('您不是主持人, 请联系主持人进行操作');
+        if (currentUser.isHost) {
+          // 请求对应用户打开 mic
+          if (!user.is_mic_on) askMicOn(user.user_id);
+          else {
+            mc?.muteUser({
+              user_id: user.user_id,
+            });
+          }
+        } else {
+          message.warn('您不是主持人, 请联系主持人进行操作');
+        }
       }
-    }
-  },[askMicOn, currentUser.isHost, currentUser.userId, mc]);
+    },
+    [askMicOn, currentUser.isHost, currentUser.userId, mc]
+  );
 
   /**
    * @brief 判断传入的 user_id 是否有声音
@@ -136,10 +138,14 @@ const UsersDrawer: React.FC<IUsersDrawerProps> = (props) => {
 
     if (currentUser.userId && localUser) {
       // 获取 user_id 用户的音量
-      const speaker = audioLevels.find(item => item.userId === user_id);
-      if(user_id === currentUser.userId && currentUser.isMicOn && localUser.volume > 0.2){
+      const speaker = audioLevels.find((item) => item.userId === user_id);
+      if (
+        user_id === currentUser.userId &&
+        currentUser.isMicOn &&
+        localUser.volume > 0.2
+      ) {
         return true;
-      }else{
+      } else {
         return speaker && speaker.volume > 0 ? true : false;
       }
     }
@@ -150,7 +156,7 @@ const UsersDrawer: React.FC<IUsersDrawerProps> = (props) => {
    * @brief 操作摄像头
    * @function onCameraChange
    */
-  const onCameraChange = (user: MeetingUser):void => {
+  const onCameraChange = (user: MeetingUser): void => {
     if (currentUser.userId === user.user_id) {
       // 如果操作的是自己
       if (deviceController.current) {
@@ -159,7 +165,7 @@ const UsersDrawer: React.FC<IUsersDrawerProps> = (props) => {
     } else {
       if (currentUser.isHost) {
         // 请求对应用户打开摄像头
-        if (!user.is_camera_on) mc?.askCameraOn({user_id: user.user_id});
+        if (!user.is_camera_on) mc?.askCameraOn({ user_id: user.user_id });
         else message.warn('对方摄像头已打开');
       } else {
         message.warn('您不是主持人, 请联系主持人进行操作');

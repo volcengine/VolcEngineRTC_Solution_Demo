@@ -86,11 +86,10 @@ export const MediaPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <div
-      style={{width: '100%', height: '100%', position: 'relative'}}
-      className='remoteStream'
+      style={{ width: '100%', height: '100%', position: 'relative' }}
+      className="remoteStream"
       id={`remoteStream_${userId}`}
       ref={dom}
-    >
-    </div>
+    ></div>
   );
 };

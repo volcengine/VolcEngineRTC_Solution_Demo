@@ -9,6 +9,7 @@
 # production
 /dist
 dist.zip
+/output
 
 
 # misc
@@ -17,3 +18,5 @@ dist.zip
 # umi
 .umi
 .umi-production
+
+.idea/

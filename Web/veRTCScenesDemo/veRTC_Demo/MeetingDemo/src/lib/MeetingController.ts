@@ -1,12 +1,11 @@
 import io from 'socket.io-client';
 import { EventEmitter } from 'eventemitter3';
 import { v4 as uuid } from 'uuid';
-import { SOCKETURL, SOCKETPATH } from '@/config';
+import { SOCKETURL, SOCKETPATH, TOASTS } from '@/config';
 import Utils from '@/utils/utils';
 import Logger from '@/utils/Logger';
 import type { MeetingInfo, MeetingUser } from '@/models/meeting';
 import { Stream, RTCClint, ConnectStatus } from '@/app-interfaces';
-import { TOASTS } from '@/config';
 import VRTC from '@volcengine/rtc';
 
 import type {
@@ -94,7 +93,6 @@ class MettingController extends EventEmitter {
       }
 
       this.socket.on('connect', () => {
-
         this._handleSocket();
 
         if (this.reconnect) {
@@ -197,15 +195,15 @@ class MettingController extends EventEmitter {
   public leaveMeeting(payload: VerifyLoginToken): Promise<null> {
     return new Promise((resolve, reject) => {
       // this.clientLeave(
-        // () => {
+      // () => {
       this.sendSignaling('leaveMeeting', payload).finally(() => {
         this.disconnect();
         resolve(null);
       });
-        // },
-        // () => {
-        //   reject('Leave RTC Room failed');
-        // }
+      // },
+      // () => {
+      //   reject('Leave RTC Room failed');
+      // }
       // );
     });
   }
@@ -333,7 +331,7 @@ class MettingController extends EventEmitter {
     };
   }
 
-  public checkSocket(): Promise<string | void> {
+  public checkSocket(): Promise<string | undefined> {
     const socketStatus = this.getConnectStatus();
     if (socketStatus.connected) {
       logger.debug('已连接');
