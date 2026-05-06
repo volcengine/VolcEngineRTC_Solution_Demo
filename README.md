@@ -30,3 +30,7 @@
 
 # 联系我们
 如果您遇到任何问题，填写[VolcengineRTC 反馈问卷](https://wenjuan.feishu.cn/m?t=sQrk90adbLwi-6ivu)，我们会竭力为您提供帮助
+
+## Security and privacy
+This project takes security seriously. 
+For vulnerability reporting and supported versions, see [SECURITY.md](SECURITY.md)
